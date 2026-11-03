@@ -34,7 +34,10 @@ export function AccountButton() {
         onClick={loginReady && !isBusy ? handleLogin : undefined}
         type="button"
       >
-        Log in
+        {/* One entry point: Blocks' hosted page signs people in and offers
+            "Create an account", and the SDK can't open its sign-up screen
+            directly. Phones keep the short label to fit beside the logo. */}
+        <span>Log in<span className="account-button__signup"> or sign up</span></span>
       </button>
       {!loginReady && <span className="sr-only" id={hintId}>Sign-in is not set up yet.</span>}
     </>

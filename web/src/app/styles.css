@@ -1413,6 +1413,16 @@ li.chip.skeleton {
   font-size: var(--text-caption);
 }
 
+.account-button__signup {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .account-button__signup {
+    display: inline;
+  }
+}
+
 /* ---------- Avatar (design.md §4.4: 1:1 circle) ---------- */
 .avatar {
   display: inline-grid;
