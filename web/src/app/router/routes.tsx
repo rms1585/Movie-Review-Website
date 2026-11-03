@@ -6,10 +6,11 @@ import { MoviePage } from "../../features/movie/MoviePage";
 import {
   InfoPage,
   NotFoundPage,
-  ProfilePage,
+  PublicProfilePage,
   ReviewsPage,
   WriteReviewPage
 } from "../../features/pages/pendingPages";
+import { MyProfilePage } from "../../features/profile/MyProfilePage";
 import { SearchPage } from "../../features/search/SearchPage";
 import { AppShell } from "../layout/AppShell";
 import { RequireAuth } from "./guards";
@@ -30,8 +31,8 @@ const routes: Route[] = [
   { pattern: /^\/movie\/(\d+)\/reviews$/, render: () => <ReviewsPage /> },
   { pattern: /^\/movie\/(\d+)\/review$/, requiresAuth: true, render: () => <WriteReviewPage /> },
   { pattern: /^\/movie\/(\d+)$/, render: ([id]) => <MoviePage id={Number(id)} key={id} /> },
-  { pattern: /^\/me(\/watchlist)?$/, requiresAuth: true, render: () => <ProfilePage /> },
-  { pattern: /^\/u\/([^/]+)$/, render: ([username]) => <ProfilePage username={username} /> },
+  { pattern: /^\/me(\/watchlist)?$/, requiresAuth: true, render: () => <MyProfilePage /> },
+  { pattern: /^\/u\/([^/]+)$/, render: ([username = ""]) => <PublicProfilePage username={username} /> },
   { pattern: /^\/about$/, render: () => <InfoPage title="About Limereel" /> },
   { pattern: /^\/terms$/, render: () => <InfoPage title="Terms" /> },
   { pattern: /^\/privacy$/, render: () => <InfoPage title="Privacy" /> }

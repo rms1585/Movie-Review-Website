@@ -1,7 +1,8 @@
 import { useId, useState } from "react";
 import { isLoginConfigured } from "../../lib/blocks/config";
 import { useAuth } from "../providers/AuthProvider";
-import { AppLink, useNavigation } from "../router/navigation";
+import { useNavigation } from "../router/navigation";
+import { UserMenu } from "./UserMenu";
 
 export function AccountButton() {
   const { status, login } = useAuth();
@@ -9,13 +10,7 @@ export function AccountButton() {
   const [isStarting, setIsStarting] = useState(false);
   const hintId = useId();
 
-  if (status === "authenticated") {
-    return (
-      <AppLink className="button button--secondary button--sm" to="/me">
-        Your profile
-      </AppLink>
-    );
-  }
+  if (status === "authenticated") return <UserMenu />;
 
   const loginReady = isLoginConfigured();
   const isBusy = status === "loading" || isStarting;

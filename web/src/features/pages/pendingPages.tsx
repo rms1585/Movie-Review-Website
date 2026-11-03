@@ -25,10 +25,10 @@ export function WriteReviewPage() {
   );
 }
 
-export function ProfilePage({ username }: { username?: string }) {
+export function PublicProfilePage({ username }: { username: string }) {
   return (
     <>
-      <PageHead title={username ?? "Your profile"} />
+      <PageHead title={username} />
       <EmptyState
         action={<AppLink className="button button--secondary" to="/browse">Find a film to rate</AppLink>}
         text="Ratings, reviews and watchlists show here once reviewing opens."
