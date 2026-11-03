@@ -1,0 +1,9 @@
+{
+  "security": [
+    { "schemaName": "Rating", "operation": 0, "policyType": 0, "accessLevel": 2, "fieldNames": [] },
+    { "schemaName": "Rating", "operation": 1, "policyType": 0, "accessLevel": 1, "fieldNames": [] },
+    { "schemaName": "Rating", "operation": 2, "policyType": 0, "accessLevel": 1, "fieldNames": [] },
+    { "schemaName": "Rating", "operation": 3, "policyType": 0, "accessLevel": 1, "fieldNames": [] }
+  ],
+  "policies": []
+}

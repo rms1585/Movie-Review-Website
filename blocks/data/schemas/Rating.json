@@ -1,0 +1,9 @@
+{
+  "schemaName": "Rating",
+  "collectionName": "blx_Ratings",
+  "schemaType": 1,
+  "fields": [
+    { "name": "tmdbMovieId", "type": "Int", "description": "TMDB id of the rated film; the join key to film data, which is never stored here." },
+    { "name": "score", "type": "Int", "description": "The rater's score, a whole number from 1 to 10 (enforced by a validation rule). One rating per user per film; the author is the system CreatedBy field." }
+  ]
+}

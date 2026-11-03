@@ -16,22 +16,13 @@ export function ReviewsPage() {
   );
 }
 
-export function WriteReviewPage() {
-  return (
-    <>
-      <PageHead title="Your review" />
-      <EmptyState action={homeAction} text="Rating and reviewing arrive with the ratings release." title="Reviewing isn't open yet" />
-    </>
-  );
-}
-
 export function PublicProfilePage({ username }: { username: string }) {
   return (
     <>
       <PageHead title={username} />
       <EmptyState
-        action={<AppLink className="button button--secondary" to="/browse">Find a film to rate</AppLink>}
-        text="Ratings, reviews and watchlists show here once reviewing opens."
+        action={<AppLink className="button button--secondary" to="/browse">Browse films</AppLink>}
+        text="Public reviewer profiles open with reviews."
         title="No reviews yet"
       />
     </>

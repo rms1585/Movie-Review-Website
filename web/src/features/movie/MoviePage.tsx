@@ -10,7 +10,9 @@ import { isInCatalogue } from "../movies/catalogue";
 import { FadeImage } from "../movies/components/FadeImage";
 import { Poster } from "../movies/components/Poster";
 import { Rail } from "../movies/components/Rail";
-import { CommunityScorePending, TmdbScore } from "../movies/components/ScoreBadge";
+import { CommunityScore, CommunityScorePending, TmdbScore } from "../movies/components/ScoreBadge";
+import { RateAction } from "../ratings/RateAction";
+import { useFilmRatings } from "../ratings/useRatings";
 import { formatReleaseDate, formatRuntime, releaseYear } from "../movies/format";
 import { backdropSource } from "../movies/images";
 import { useCachedSummary, useMovie } from "../movies/queries";
@@ -44,6 +46,7 @@ export function MoviePage({ id }: { id: number }) {
 }
 
 function MovieDetailView({ movie }: { movie: MovieDetail }) {
+  const ratings = useFilmRatings(movie.id);
   const year = releaseYear(movie.releaseDate);
   const backdrop = movie.backdropPath ? backdropSource(movie.backdropPath) : undefined;
 
@@ -75,11 +78,19 @@ function MovieDetailView({ movie }: { movie: MovieDetail }) {
             {movie.genres.map((genre) => <li key={genre.id}>{genre.name}</li>)}
           </ul>
           <div className="movie__scores">
-            <CommunityScorePending size="lg" />
+            {ratings.community.average !== null
+              ? <CommunityScore average={ratings.community.average} count={ratings.community.count} size="lg" />
+              : <CommunityScorePending size="lg" />}
             <TmdbScore score={movie.tmdbScore} size="lg" votes={movie.tmdbVoteCount} />
           </div>
-          {movie.trailerKey && (
-            <div>
+          {ratings.myRating && (
+            <p className="movie__my-rating">
+              You rated it <strong>{ratings.myRating.score}</strong> out of 10
+            </p>
+          )}
+          <div className="movie__actions">
+            <RateAction filmTitle={movie.title} hasRated={Boolean(ratings.myRating)} tmdbMovieId={movie.id} />
+            {movie.trailerKey && (
               <a
                 className="button button--secondary"
                 href={`https://www.youtube.com/watch?v=${movie.trailerKey}`}
@@ -90,8 +101,8 @@ function MovieDetailView({ movie }: { movie: MovieDetail }) {
                 Watch trailer
                 <span className="sr-only">(opens YouTube in a new tab)</span>
               </a>
-            </div>
-          )}
+            )}
+          </div>
         </m.div>
       </div>
 

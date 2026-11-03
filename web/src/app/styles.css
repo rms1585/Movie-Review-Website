@@ -3,6 +3,7 @@
 /* Hallmark · dismissed 25 · the empty-state line is a one-sentence caption, which may sit from 28ch */
 /* Hallmark · dismissed 29 · the sticky header's 90% surface with a blur is specified in design.md §7.5, the locked system */
 /* Hallmark · dismissed 41 · text on lime uses --color-on-accent, design.md's name for the accent ink */
+/* Hallmark · dismissed F7 · avatars and cast photos are circles by design.md §4.4, and the rest are round controls or the sheet handle */
 /* Hallmark · waive 24b · badge padding tokens 2/6 and 6/12 · score badge padding is fixed by design.md §7.2 so small badges sit tight beside poster titles */
 
 @tailwind base;
@@ -70,6 +71,8 @@
   --content-max: 1120px;
   --gutter: 16px;
   --search-max: 520px;
+  --dialog-w: 420px;
+  --rate-poster: 72px;
   --avatar-sm: 32px;
   --avatar-lg: 96px;
   --badge-pad-sm: 2px 6px;
@@ -730,6 +733,13 @@ a {
 .score--tmdb {
   border: 1px solid var(--color-border-strong);
   color: var(--color-text-muted);
+}
+
+.score--community {
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 700;
 }
 
 .score--lg {
@@ -1563,6 +1573,262 @@ button.user-menu__trigger:active {
 .profile-head__email {
   color: var(--color-text-muted);
   overflow-wrap: anywhere;
+}
+
+/* ---------- Film page: your rating + actions ---------- */
+.movie__my-rating {
+  color: var(--color-text-muted);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+}
+
+.movie__my-rating strong {
+  color: var(--color-text);
+}
+
+.movie__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* ---------- Rating screen (SPEC §7.5) ---------- */
+.rate {
+  display: grid;
+  gap: var(--section-gap);
+  max-width: 720px;
+}
+
+.rate__film {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.rate__poster {
+  flex: none;
+  width: var(--rate-poster);
+}
+
+.rate__film-text {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.rate__year {
+  color: var(--color-text-muted);
+  font-size: var(--text-ui);
+}
+
+.rate__section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.rate__label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.rate__label {
+  font-family: var(--font-body);
+  font-variation-settings: normal;
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+  font-weight: 600;
+}
+
+.rate__status {
+  min-height: var(--leading-ui);
+  color: var(--color-text-muted);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+}
+
+.rate__saved {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text);
+}
+
+.rate__saved .icon {
+  color: var(--color-accent);
+}
+
+/* ---------- Rating control (design.md §7.7) ---------- */
+.rating-control {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+@media (min-width: 768px) {
+  .rating-control {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+}
+
+.rating-control__score {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  aspect-ratio: 1;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" var(--display-width);
+  font-size: var(--text-h2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color var(--motion-instant) var(--ease-standard), border-color var(--motion-instant) var(--ease-standard), color var(--motion-instant) var(--ease-standard);
+}
+
+.rating-control__score:hover {
+  background: var(--color-surface-raised);
+}
+
+.rating-control__score[aria-checked="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.rating-control[aria-disabled="true"] .rating-control__score {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- Dialog / bottom sheet (design.md §7.11, animation.md §4.11) ---------- */
+.dialog {
+  width: min(var(--dialog-w), calc(100% - var(--gutter) * 2));
+  max-width: none;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: var(--shadow-float);
+}
+
+.dialog::backdrop {
+  background: var(--color-overlay);
+}
+
+.dialog[open] {
+  animation: dialog-enter var(--motion-slow) var(--ease-enter);
+}
+
+.dialog[open]::backdrop {
+  animation: backdrop-enter var(--motion-base) var(--ease-enter);
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes backdrop-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+.dialog__panel {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.dialog__handle {
+  display: none;
+}
+
+.dialog__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.dialog__title {
+  font-family: var(--font-body);
+  font-variation-settings: normal;
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+  font-weight: 600;
+}
+
+.dialog__close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--target-min);
+  height: var(--target-min);
+  margin: calc(var(--space-3) * -1) calc(var(--space-3) * -1) 0 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background-color var(--motion-instant) var(--ease-standard), color var(--motion-instant) var(--ease-standard);
+}
+
+.dialog__close:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.dialog__text {
+  color: var(--color-text-muted);
+}
+
+.dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* Phones get a bottom sheet in thumb reach. */
+@media (max-width: 767px) {
+  .dialog {
+    width: 100%;
+    margin: auto 0 0;
+    border-radius: var(--radius-sheet);
+  }
+
+  .dialog[open] {
+    animation: sheet-enter var(--motion-slow) var(--ease-enter);
+  }
+
+  .dialog__handle {
+    display: block;
+    justify-self: center;
+    width: var(--space-10);
+    height: var(--space-1);
+    margin-top: calc(var(--space-2) * -1);
+    border-radius: var(--radius-pill);
+    background: var(--color-border-strong);
+  }
+
+  .dialog__actions {
+    display: grid;
+  }
+}
+
+@keyframes sheet-enter {
+  from {
+    transform: translateY(100%);
+  }
 }
 
 /* ---------- Reduced motion (animation.md §5) ---------- */

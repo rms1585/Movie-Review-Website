@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
     : undefined;
 
   const apiTarget = env.VITE_BLOCKS_API_URL || "https://api.seliseblocks.com";
+  const appDomain = env.VITE_BLOCKS_APP_DOMAIN?.replace(/\/+$/, "");
 
   return {
     plugins: [react()],
@@ -42,6 +43,16 @@ export default defineConfig(({ mode }) => {
           // Browsers treat localhost/127.0.0.1 as trustworthy, so the cookie's
           // Secure flag survives plain http on those hosts.
           cookieDomainRewrite: { "*": "" },
+          // The Data gateway also checks Origin/Referer and answers 406
+          // Invalid_Origin_Or_Referer to anything but the registered app domain.
+          // This relay is server-to-server, so it presents that domain.
+          configure: (proxy) => {
+            if (!appDomain) return;
+            proxy.on("proxyReq", (proxyRequest) => {
+              proxyRequest.setHeader("origin", appDomain);
+              proxyRequest.setHeader("referer", `${appDomain}/`);
+            });
+          },
           rewrite: (requestPath: string) => requestPath.replace(/^\/blocks-api/, ""),
           secure: true,
           target: apiTarget

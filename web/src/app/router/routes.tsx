@@ -7,10 +7,10 @@ import {
   InfoPage,
   NotFoundPage,
   PublicProfilePage,
-  ReviewsPage,
-  WriteReviewPage
+  ReviewsPage
 } from "../../features/pages/pendingPages";
 import { MyProfilePage } from "../../features/profile/MyProfilePage";
+import { RatePage } from "../../features/ratings/RatePage";
 import { SearchPage } from "../../features/search/SearchPage";
 import { AppShell } from "../layout/AppShell";
 import { RequireAuth } from "./guards";
@@ -29,7 +29,7 @@ const routes: Route[] = [
   { pattern: /^\/search$/, render: (_, search) => <SearchPage query={search.get("q") ?? ""} /> },
   { pattern: /^\/browse$/, render: (_, search) => <BrowsePage search={search} /> },
   { pattern: /^\/movie\/(\d+)\/reviews$/, render: () => <ReviewsPage /> },
-  { pattern: /^\/movie\/(\d+)\/review$/, requiresAuth: true, render: () => <WriteReviewPage /> },
+  { pattern: /^\/movie\/(\d+)\/review$/, requiresAuth: true, render: ([id]) => <RatePage key={id} tmdbMovieId={Number(id)} /> },
   { pattern: /^\/movie\/(\d+)$/, render: ([id]) => <MoviePage id={Number(id)} key={id} /> },
   { pattern: /^\/me(\/watchlist)?$/, requiresAuth: true, render: () => <MyProfilePage /> },
   { pattern: /^\/u\/([^/]+)$/, render: ([username = ""]) => <PublicProfilePage username={username} /> },
