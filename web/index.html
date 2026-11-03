@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0E1116" />
+    <meta name="color-scheme" content="dark" />
+    <title>Limereel</title>
+    <meta name="description" content="Find a film, read spoiler-safe reviews, and rate what you watch." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Archivo carries titles (width axis for the condensed poster cut);
+         Atkinson Hyperlegible Next carries everything people read. Only the
+         weights design.md lists are requested, and display=swap shows the
+         system face until they arrive so a slow network never blanks the page. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,700..800&family=Atkinson+Hyperlegible+Next:wght@400;500;600&display=swap" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>Limereel needs JavaScript to load films and reviews.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

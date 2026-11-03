@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limereel Body Fonts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,700..800&family=Inter:wght@400;500;600&family=Schibsted+Grotesk:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&family=Atkinson+Hyperlegible+Next:wght@400;500;600&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Side-by-side test of body fonts under the Archivo headings, on the real dark theme and real sizes from design.md. */
+  :root {
+    --color-bg: #0E1116;
+    --color-surface: #181C23;
+    --color-border: #2C333E;
+    --color-text: #F2F2F0;
+    --color-text-muted: #9BA1A6;
+    --color-accent: #C6F432;
+    --color-on-accent: #0E1116;
+    --font-display: "Archivo", "Arial Narrow", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font: 15px/1.5 -apple-system, BlinkMacSystemFont, sans-serif; }
+  .page { max-width: 1280px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font: 800 32px/1.15 var(--font-display); font-variation-settings: "wdth" 80; margin: 0 0 8px; }
+  .lede { color: var(--color-text-muted); margin: 0 0 28px; max-width: 760px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+  .sample { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 22px; }
+  .font-name { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 14px; display: flex; justify-content: space-between; }
+  .film-title { font: 800 30px/1.1 var(--font-display); font-variation-settings: "wdth" 80; margin: 0 0 4px; }
+  .meta { font-size: 14px; line-height: 20px; color: var(--color-text-muted); font-weight: 500; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 12px 0 16px; }
+  .score { border-radius: 6px; padding: 4px 9px; font-size: 14px; font-weight: 600; }
+  .score-ours { background: var(--color-accent); color: var(--color-on-accent); }
+  .score-tmdb { border: 1px solid #3D4552; color: var(--color-text-muted); }
+  .btn { border-radius: 10px; padding: 10px 18px; font-size: 14px; font-weight: 600; border: 1px solid #3D4552; background: none; color: var(--color-text); }
+  .btn-primary { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
+  .verdict { border-left: 3px solid var(--color-accent); padding-left: 12px; font-size: 20px; line-height: 28px; font-weight: 600; margin: 0 0 14px; }
+  .review { font-size: 16px; line-height: 26px; margin: 0 0 12px; }
+  .caption { font-size: 12px; line-height: 16px; color: var(--color-text-muted); font-weight: 500; }
+  .tricky { font-size: 16px; margin-top: 10px; color: var(--color-text-muted); }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>Body font comparison</h1>
+  <p class="lede">Each card uses Archivo for the film title (as in design.md) and a different body font for everything else, at the real sizes: 16px reviews, 14px buttons and metadata, 12px captions. The last line in each card tests easily confused characters: Il1 O0 rn/m.</p>
+  <div class="grid" id="grid"></div>
+</main>
+<script>
+  const fonts = [
+    ["Inter", "current default"],
+    ["Schibsted Grotesk", "editorial"],
+    ["Instrument Sans", "sharp, modern"],
+    ["Atkinson Hyperlegible Next", "max legibility"],
+    ["Onest", "soft, friendly"],
+  ];
+  document.getElementById("grid").innerHTML = fonts.map(([family, note]) => `
+    <article class="sample" style="font-family: '${family}', sans-serif;">
+      <div class="font-name"><span>${family}</span><span>${note}</span></div>
+      <h2 class="film-title">The Long Quiet Road</h2>
+      <div class="meta">2024 · 2h 46m · Sci-Fi, Drama · PG-13</div>
+      <div class="row">
+        <span class="score score-ours">8.4 · 1,204 ratings</span><span class="score score-tmdb">TMDB 7.9</span>
+      </div>
+      <p class="verdict">Huge, loud and somehow intimate.</p>
+      <p class="review">The first hour moves slowly, but the final act earns every minute. The sound design alone is worth seeing it on the biggest screen you can find, and the lead gives a quietly devastating performance.</p>
+      <div class="row"><button class="btn btn-primary">★ Rate</button><button class="btn">+ Watchlist</button><button class="btn">Seen it</button></div>
+      <div class="caption">Daniel · 9/10 · 48 found this helpful · 2 days ago</div>
+      <div class="tricky">Il1 O0 rn m — Illinois 1911, modern 0.8</div>
+    </article>`).join("");
+</script>
+</body>
+</html>

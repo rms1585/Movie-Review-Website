@@ -1,0 +1,23 @@
+{
+  "name": "TMDB",
+  "upstream": "https://api.themoviedb.org/3",
+  "methods": ["GET"],
+  "headers": [
+    { "key": "Authorization", "value": "Bearer {{$VAR.TMDB_READ_TOKEN}}" },
+    { "key": "Accept", "value": "application/json" }
+  ],
+  "routes": [
+    { "method": "GET", "path": "trending/movie/{window}", "upstreamPath": "trending/movie/{window}" },
+    { "method": "GET", "path": "discover/movie", "upstreamPath": "discover/movie" },
+    { "method": "GET", "path": "search/movie", "upstreamPath": "search/movie" },
+    { "method": "GET", "path": "movie/{id}", "upstreamPath": "movie/{id}" },
+    { "method": "GET", "path": "genre/movie/list", "upstreamPath": "genre/movie/list" }
+  ],
+  "access": { "kind": "Public" },
+  "resilience": {
+    "timeoutSeconds": 10,
+    "retry": { "attempts": 2, "backoff": "Fixed", "initialDelaySeconds": 1, "idempotent": true },
+    "breaker": { "failureThreshold": 5, "openSeconds": 60 }
+  },
+  "requestsPerMinute": 2000
+}

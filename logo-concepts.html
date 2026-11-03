@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limereel Logo Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible+Next:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Concept sheet: rough directions to choose from, not a finished identity. */
+  :root {
+    --paper: #f1f1ef;
+    --card: #ffffff;
+    --ink: #1f1f1f;
+    --ink-2: #555555;
+    --line: #d4d4d0;
+    --night: #0E1116;
+    --night-surface: #181C23;
+    --lime: #C6F432;
+    --radius: 12px;
+    --font-ui: "Atkinson Hyperlegible Next", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-display: "Archivo", "Arial Narrow", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 var(--font-ui); }
+  .page { max-width: 1120px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font: 800 32px/1.15 var(--font-display); font-variation-settings: "wdth" 80; margin: 0 0 8px; }
+  .lede { color: var(--ink-2); max-width: 720px; margin: 0 0 32px; }
+  .concept { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+  .concept-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .concept-head h2 { margin: 0; font: 800 24px/1.2 var(--font-display); font-variation-settings: "wdth" 80; }
+  .tag { font-size: 12px; font-weight: 600; border: 1px solid var(--ink); border-radius: 999px; padding: 2px 10px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .tile { border-radius: 10px; min-height: 220px; display: grid; place-items: center; padding: 28px; position: relative; }
+  .tile-light { background: var(--paper); color: var(--ink); }
+  .tile-dark { background: var(--night); color: var(--lime); }
+  .tile-label { position: absolute; left: 12px; top: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.75; }
+  .tile-dark .tile-label { color: #9BA1A6; opacity: 1; }
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 18px; }
+  .notes h3 { margin: 0 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+  .notes p, .notes ul { margin: 0; }
+  .notes ul { padding-left: 18px; }
+
+  .wordmark { font: 800 72px/1 var(--font-display); font-variation-settings: "wdth" 78; letter-spacing: -0.01em; display: inline-flex; align-items: baseline; }
+  .wordmark .i-wrap { position: relative; display: inline-block; }
+  .wordmark .i-dot { position: absolute; left: 50%; bottom: 0.72em; width: 0.3em; height: 0.3em; transform: translateX(-50%); }
+  .wordmark-dark { color: #F2F2F0; }
+  .wordmark-dark .i-dot { color: var(--lime); }
+
+  .sizes { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px; }
+  .size { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-2); }
+  .tile-dark .size { color: #9BA1A6; }
+  .tile-dark .size [data-mark] { color: var(--lime); }
+  .app-icon { display: grid; place-items: center; background: var(--night); color: var(--lime); border-radius: 22%; }
+
+  .next { background: var(--card); border: 1.5px dashed var(--ink-2); border-radius: var(--radius); padding: 20px 24px; }
+  .next h2 { margin: 0 0 8px; font: 800 20px/1.2 var(--font-display); font-variation-settings: "wdth" 80; }
+  .next ol { margin: 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>Limereel: logo concepts v0.1</h1>
+  <p class="lede">Three rough directions built on one idea: <b>a lime slice that is also a film reel</b>. The lime's segments double as the reel's cut-outs. Every mark is one flat colour, so it works on light and dark backgrounds and at tiny sizes. These are concepts to choose a direction from. A designer refines the chosen one into the final logo.</p>
+
+  <!-- ============ CONCEPT A ============ -->
+  <section class="concept" aria-labelledby="a-title">
+    <div class="concept-head"><h2 id="a-title">A · Slice-Reel mark</h2><span class="tag">Symbol</span></div>
+    <div class="tiles">
+      <div class="tile tile-light"><span class="tile-label">One colour</span><div data-mark="slice" data-size="150"></div></div>
+      <div class="tile tile-dark"><span class="tile-label">On After Hours</span><div data-mark="slice" data-size="150"></div></div>
+      <div class="tile tile-dark"><span class="tile-label">Small-size test</span>
+        <div class="sizes">
+          <div class="size"><div data-mark="slice" data-size="16"></div>16</div>
+          <div class="size"><div data-mark="slice" data-size="24"></div>24</div>
+          <div class="size"><div data-mark="slice" data-size="32"></div>32</div>
+          <div class="size"><div data-mark="slice" data-size="64"></div>64</div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div><h3>Idea</h3><p>A lime cut across: the rind becomes the reel's rim, the six segments become the reel's cut-outs, and the core becomes the hub. You see a lime first, then the reel.</p></div>
+      <div><h3>Strengths</h3><ul><li>Simple, so it survives at 16px (browser tab icon).</li><li>Uses the lime brand colour naturally.</li><li>Works on its own, as an app icon or as an avatar.</li></ul></div>
+      <div><h3>Risks</h3><ul><li>At a glance it reads more "fruit" than "film". It needs the name next to it early on.</li><li>Round, segmented marks are common (Chrome, citrus brands). A designer should make the segment shapes unmistakably reel-like.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ============ CONCEPT B ============ -->
+  <section class="concept" aria-labelledby="b-title">
+    <div class="concept-head"><h2 id="b-title">B · Unspooling lockup</h2><span class="tag">Symbol + wordmark</span></div>
+    <div class="tiles" style="grid-template-columns: 1fr;">
+      <div class="tile tile-light"><span class="tile-label">One colour</span><div data-mark="lockup" data-width="440"></div></div>
+      <div class="tile tile-dark"><span class="tile-label">On After Hours</span><div data-mark="lockup" data-width="440" data-two-tone></div></div>
+    </div>
+    <div class="notes">
+      <div><h3>Idea</h3><p>The slice-reel from A, with a strip of film running out from its base and becoming the line under the name. It says "film" without words.</p></div>
+      <div><h3>Strengths</h3><ul><li>Reads as film immediately, which fixes A's "just fruit" risk.</li><li>A natural animation for the site: the strip unspools on first load.</li></ul></div>
+      <div><h3>Risks</h3><ul><li>Wide, so it only fits headers and the footer. A is still needed for small places.</li><li>The film strip gets busy below about 120px wide. Drop it at small sizes.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ============ CONCEPT C ============ -->
+  <section class="concept" aria-labelledby="c-title">
+    <div class="concept-head"><h2 id="c-title">C · Wordmark with slice dot</h2><span class="tag">Wordmark</span></div>
+    <div class="tiles">
+      <div class="tile tile-light"><span class="tile-label">One colour</span><div class="wordmark" data-wordmark></div></div>
+      <div class="tile tile-dark"><span class="tile-label">On After Hours</span><div class="wordmark wordmark-dark" data-wordmark></div></div>
+    </div>
+    <div class="notes">
+      <div><h3>Idea</h3><p>The name does the work. The only symbol is a tiny lime slice dotting the "i". It's quiet, confident and editorial.</p></div>
+      <div><h3>Strengths</h3><ul><li>The name is memorised from day one, which matters most for a new brand.</li><li>Easiest to execute well, and the slice dot can grow into the A symbol later.</li></ul></div>
+      <div><h3>Risks</h3><ul><li>The slice is tiny here, so the film idea is mostly lost.</li><li>It relies on the typeface. This uses Archivo from design.md, and a custom-drawn wordmark would be stronger.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ============ APP ICON / FAVICON ============ -->
+  <section class="concept" aria-labelledby="d-title">
+    <div class="concept-head"><h2 id="d-title">In use · favicon and app icon</h2><span class="tag">Applies A</span></div>
+    <div class="tiles">
+      <div class="tile tile-light"><span class="tile-label">App icon / social avatar</span>
+        <div class="sizes">
+          <div class="size"><div class="app-icon" style="width:96px;height:96px;"><div data-mark="slice" data-size="66"></div></div>96</div>
+          <div class="size"><div class="app-icon" style="width:48px;height:48px;"><div data-mark="slice" data-size="34"></div></div>48</div>
+          <div class="size"><div class="app-icon" style="width:32px;height:32px;"><div data-mark="slice" data-size="22"></div></div>32</div>
+        </div>
+      </div>
+      <div class="tile tile-light"><span class="tile-label">Header (desktop)</span>
+        <div style="display:flex; align-items:center; gap:5px; background:var(--night); padding:14px 18px; border-radius:10px; color:var(--lime);">
+          <div data-mark="slice" data-size="28"></div>
+          <span style="font:800 24px/1 var(--font-display); font-variation-settings:'wdth' 78; color:#F2F2F0;">limereel</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="next" aria-labelledby="next-title">
+    <h2 id="next-title">Before this becomes the real logo</h2>
+    <ol>
+      <li><b>Direction chosen:</b> the <b>horizontal lockup</b> (symbol A + wordmark side by side, tight spacing), with <b>A alone</b> for favicons, app icons and avatars.</li>
+      <li><b>Check the name:</b> domain (limereel.com / .app / .film), social handles and a trademark search.</li>
+      <li><b>Designer refinement:</b> optical balance, making the segment shapes more reel-like, custom letter spacing, and exporting SVG, PNG and favicon sets.</li>
+    </ol>
+  </section>
+</main>
+
+<script>
+  // One geometry for the slice-reel symbol, reused by every concept so they stay consistent.
+  const CENTER = 50;
+  const SEGMENTS = 6;
+  const SEGMENT_INNER_R = 13;
+  const SEGMENT_OUTER_R = 33;
+  const HALF_GAP = 3.6;      // keeps the membranes between segments an even width from hub to rim
+  const CORNER_ROUNDING = 3; // stroke that rounds segment corners, like a reel's cut-outs
+
+  const polar = (radius, degrees) => {
+    const rad = (degrees * Math.PI) / 180;
+    return [(CENTER + radius * Math.cos(rad)).toFixed(2), (CENTER + radius * Math.sin(rad)).toFixed(2)];
+  };
+
+  function segmentPath(index) {
+    const step = 360 / SEGMENTS;
+    const middle = index * step - 90 + step / 2;
+    const offsetAt = (r) => (Math.asin(HALF_GAP / r) * 180) / Math.PI;
+    const innerStart = polar(SEGMENT_INNER_R, middle - step / 2 + offsetAt(SEGMENT_INNER_R));
+    const innerEnd = polar(SEGMENT_INNER_R, middle + step / 2 - offsetAt(SEGMENT_INNER_R));
+    const outerStart = polar(SEGMENT_OUTER_R, middle - step / 2 + offsetAt(SEGMENT_OUTER_R));
+    const outerEnd = polar(SEGMENT_OUTER_R, middle + step / 2 - offsetAt(SEGMENT_OUTER_R));
+    return `M${innerStart} L${outerStart} A${SEGMENT_OUTER_R} ${SEGMENT_OUTER_R} 0 0 1 ${outerEnd} ` +
+           `L${innerEnd} A${SEGMENT_INNER_R} ${SEGMENT_INNER_R} 0 0 0 ${innerStart} Z`;
+  }
+
+  const sliceShapes = () => `
+    <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="6"/>
+    <g fill="currentColor" stroke="currentColor" stroke-width="${CORNER_ROUNDING}" stroke-linejoin="round">
+      ${Array.from({ length: SEGMENTS }, (_, i) => `<path d="${segmentPath(i)}"/>`).join("")}
+    </g>
+    <circle cx="50" cy="50" r="5" fill="currentColor"/>`;
+
+  const sliceSvg = (size) =>
+    `<svg viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="Limereel symbol" style="display:block">${sliceShapes()}</svg>`;
+
+  // Lockup: symbol, wordmark, and a film strip that runs from the symbol's base under the name.
+  function lockupSvg(width, twoTone) {
+    const textColor = twoTone ? "#F2F2F0" : "currentColor";
+    const holes = Array.from({ length: 30 }, (_, i) =>
+      `<rect x="${64 + i * 11}" y="93.5" width="5" height="5" rx="1" fill="black"/>`).join("");
+    return `
+      <svg viewBox="0 0 420 108" width="${width}" role="img" aria-label="Limereel logo" style="display:block; max-width:100%; height:auto;">
+        <defs><mask id="strip-holes-${twoTone ? "d" : "l"}">
+          <rect x="0" y="0" width="420" height="108" fill="white"/>${holes}
+        </mask></defs>
+        <g transform="translate(0,2) scale(0.96)">${sliceShapes()}</g>
+        <rect x="50" y="90" width="370" height="12" rx="2" fill="currentColor" mask="url(#strip-holes-${twoTone ? "d" : "l"})"/>
+        <text x="112" y="74" fill="${textColor}"
+          style="font: 800 74px var(--font-display); font-variation-settings: 'wdth' 78; letter-spacing: -0.5px;">limereel</text>
+      </svg>`;
+  }
+
+  document.querySelectorAll('[data-mark="slice"]').forEach((el) => { el.innerHTML = sliceSvg(el.dataset.size); });
+  document.querySelectorAll('[data-mark="lockup"]').forEach((el) => {
+    el.innerHTML = lockupSvg(el.dataset.width, el.hasAttribute("data-two-tone"));
+  });
+  // Dotless "ı" plus the slice as its dot.
+  document.querySelectorAll("[data-wordmark]").forEach((el) => {
+    el.innerHTML = `<span>l</span><span class="i-wrap">ı<span class="i-dot">${sliceSvg("100%")}</span></span><span>mereel</span>`;
+    el.setAttribute("aria-label", "limereel");
+    el.setAttribute("role", "img");
+  });
+</script>
+</body>
+</html>

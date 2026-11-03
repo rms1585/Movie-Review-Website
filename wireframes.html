@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Movie Review Wireframes</title>
+<style>
+  /* Low-fidelity on purpose: grayscale, system font, placeholder boxes. Structure only. */
+  :root {
+    --paper: #f1f1ef;
+    --frame: #ffffff;
+    --ink: #1f1f1f;
+    --ink-2: #555555;
+    --ink-3: #666666;
+    --line: #cfcfcf;
+    --fill: #e8e8e8;
+    --fill-2: #d6d6d6;
+    --overlay: rgba(20, 20, 20, 0.55);
+    --radius: 8px;
+    --content-max: 1120px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.45 var(--font); }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* ---------- Page chrome (outside the website frame) ---------- */
+  .page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 20px 16px 4px; max-width: 1500px; margin: 0 auto; }
+  .page-head h1 { margin: 0 0 4px; font-size: 20px; }
+  .page-head p { margin: 0; color: var(--ink-2); max-width: 760px; }
+  .view-toggle { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .view-toggle button { border: 0; background: var(--frame); padding: 7px 16px; font-weight: 600; }
+  .view-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--frame); }
+  .layout { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 24px; max-width: 1500px; margin: 0 auto; padding: 16px; }
+  .toc { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 16px; align-self: start; }
+  .toc button { text-align: left; background: none; border: 1px solid transparent; border-radius: var(--radius); padding: 8px 10px; color: var(--ink-2); }
+  .toc button:hover { background: var(--fill); }
+  .toc button[aria-current="true"] { background: var(--frame); border-color: var(--line); color: var(--ink); font-weight: 600; }
+  .screen-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .screen-head h2 { margin: 0; font-size: 18px; }
+  .states { display: flex; flex-wrap: wrap; gap: 6px; }
+  .states span { color: var(--ink-3); font-size: 12px; align-self: center; }
+  .states button { border: 1px solid var(--line); background: var(--frame); border-radius: 999px; padding: 4px 10px; font-size: 12px; }
+  .states button[aria-pressed="true"] { background: var(--ink); color: var(--frame); border-color: var(--ink); }
+  .notes { margin: 20px 0 0; padding-left: 20px; color: var(--ink-2); columns: 2 320px; column-gap: 40px; max-width: 1100px; }
+  .notes li { margin-bottom: 10px; break-inside: avoid; }
+  .notes b { color: var(--ink); }
+
+  /* ---------- Website frame: browser window on desktop, phone on mobile ---------- */
+  .frame { width: 100%; max-width: 1280px; background: var(--frame); border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; transition: width 0.2s; }
+  body[data-view="mobile"] .frame { width: 390px; max-width: 100%; border-radius: 28px; }
+  .frame-bar { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1.5px solid var(--ink); background: var(--fill); }
+  .frame-bar .dots { letter-spacing: 3px; color: var(--ink-3); font-size: 10px; }
+  .frame-bar .url { flex: 1; background: var(--frame); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  @media (prefers-reduced-motion: reduce) { .frame { transition: none; } }
+
+  /* The site inside the frame adapts to the frame's width, not the window's, so the toggle shows the real responsive layout. */
+  .site { container: site / inline-size; position: relative; min-height: 640px; }
+  .c { max-width: var(--content-max); margin: 0 auto; padding: 0 14px; }
+  .only-d { display: none; }
+
+  /* ---------- Wireframe primitives ---------- */
+  .ph { background:
+      linear-gradient(to top right, transparent calc(50% - 0.5px), var(--line) 50%, transparent calc(50% + 0.5px)),
+      linear-gradient(to top left, transparent calc(50% - 0.5px), var(--line) 50%, transparent calc(50% + 0.5px)),
+      var(--fill);
+    border: 1px solid var(--line); border-radius: 6px; display: grid; place-items: center; color: var(--ink-2); font-size: 11px; }
+  .ln { height: 9px; background: var(--fill-2); border-radius: 4px; margin: 6px 0; }
+  .w90 { width: 90%; } .w75 { width: 75%; } .w60 { width: 60%; } .w40 { width: 40%; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .between { justify-content: space-between; }
+  .wrap { flex-wrap: wrap; }
+  .muted { color: var(--ink-3); font-size: 12px; }
+  .h-title { font-size: 20px; font-weight: 800; margin: 0; line-height: 1.2; }
+  .h-page { font-size: 18px; font-weight: 800; margin: 18px 0 10px; }
+  .h-sec { font-size: 15px; font-weight: 700; margin: 22px 0 10px; }
+  .link { color: var(--ink); font-weight: 600; text-decoration: underline; background: none; border: 0; padding: 0; }
+  .divider { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+  .box { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+
+  .btn { border: 1.5px solid var(--ink); background: var(--frame); border-radius: var(--radius); padding: 9px 14px; font-weight: 600; text-decoration: none; display: inline-block; text-align: center; }
+  .btn:hover { background: var(--fill); }
+  .btn-primary { background: var(--ink); color: var(--frame); }
+  .btn-primary:hover { background: var(--ink-2); }
+  .btn-block { width: 100%; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .chip { border: 1px solid var(--line); background: var(--frame); border-radius: 999px; padding: 5px 11px; font-size: 12px; white-space: nowrap; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--frame); border-color: var(--ink); }
+
+  /* Community score is solid, TMDB score is outlined, so the two never read as the same thing. */
+  .score { display: inline-flex; align-items: baseline; gap: 4px; border-radius: 6px; padding: 3px 7px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .score-ours { background: var(--ink); color: var(--frame); }
+  .score-tmdb { border: 1px solid var(--ink-3); color: var(--ink-2); font-weight: 600; }
+  .score-lg { font-size: 16px; padding: 5px 10px; }
+  .score small { font-weight: 400; opacity: 0.85; }
+
+  .banner { border: 1.5px dashed var(--ink-2); border-radius: var(--radius); padding: 10px 12px; margin: 12px 0; background: var(--fill); }
+
+  /* ---------- Site header / footer ---------- */
+  .app-header { position: sticky; top: 0; z-index: 6; background: var(--frame); border-bottom: 1px solid var(--line); padding: 12px 0; }
+  .hdr { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "logo . actions" "search search search"; gap: 10px 12px; align-items: center; }
+  .logo { grid-area: logo; border: 1.5px solid var(--ink); border-radius: 4px; padding: 2px 8px; font-weight: 800; letter-spacing: 1px; font-size: 12px; text-decoration: none; color: inherit; justify-self: start; }
+  .hdr-nav { display: none; gap: 18px; }
+  .hdr-nav a { color: inherit; text-decoration: none; font-weight: 600; }
+  .hdr-nav a:hover { text-decoration: underline; }
+  .hdr-actions { grid-area: actions; display: flex; align-items: center; gap: 12px; }
+  .search-wrap { grid-area: search; position: relative; }
+  .search { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--ink-2); border-radius: 999px; padding: 8px 14px; color: var(--ink-3); }
+  .search input { border: 0; outline: 0; flex: 1; min-width: 0; background: none; color: var(--ink); }
+  .suggest { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 7; background: var(--frame); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 4px 0; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--fill-2); border: 1px solid var(--ink-3); flex: none; padding: 0; }
+  .app-footer { border-top: 1px solid var(--line); padding: 18px 0; margin-top: 32px; color: var(--ink-2); font-size: 12px; }
+  .footer-in { display: flex; flex-direction: column; gap: 12px; }
+  .tmdb-logo { width: 72px; height: 24px; flex: none; }
+
+  /* ---------- Cards, rails, grids, result rows ---------- */
+  .rail { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; }
+  .card { flex: none; width: 108px; text-decoration: none; color: inherit; }
+  .card .ph { aspect-ratio: 2 / 3; }
+  .card:hover .ph { border-color: var(--ink); }
+  .card .t { font-size: 12px; font-weight: 600; margin-top: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid .card { width: auto; }
+  .skeleton .ph { background: var(--fill); border-color: var(--fill); color: transparent; }
+
+  .result { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--fill); text-decoration: none; color: inherit; }
+  .result:hover { background: var(--paper); }
+  .result .ph { width: 48px; height: 72px; flex: none; }
+  .result-body { flex: 1; min-width: 0; }
+  .suggest .result { padding: 8px 12px; border-bottom: 0; }
+  .suggest .result .ph { width: 32px; height: 48px; }
+
+  .empty { text-align: center; padding: 48px 20px; }
+  .empty .ph { width: 64px; height: 64px; margin: 0 auto 12px; border-radius: 50%; }
+
+  /* ---------- Home ---------- */
+  .hero { position: relative; }
+  .hero > .ph { aspect-ratio: 16 / 9; border-radius: 0; border-left: 0; border-right: 0; }
+  .hero-card { position: absolute; left: 14px; right: 14px; bottom: 12px; background: var(--frame); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+  .hero-title { font-weight: 800; font-size: 16px; margin: 2px 0; }
+
+  /* ---------- Browse ---------- */
+  .browse-layout { display: block; }
+  .filters { display: none; }
+  .filter-group { margin-bottom: 18px; }
+  .filter-group h3 { margin: 0 0 8px; font-size: 13px; }
+  .filter-group label { display: flex; gap: 8px; align-items: center; padding: 3px 0; }
+  .filter-group select { width: 100%; padding: 7px; border: 1.5px solid var(--ink-3); border-radius: var(--radius); background: var(--frame); }
+
+  /* ---------- Movie detail ---------- */
+  .backdrop { aspect-ratio: 16 / 9; border-radius: 0; border-left: 0; border-right: 0; }
+  .detail-head { display: grid; grid-template-columns: 96px 1fr; grid-template-areas: "poster info" "actions actions"; column-gap: 12px; row-gap: 14px; margin-top: -40px; position: relative; }
+  .detail-head .poster { grid-area: poster; aspect-ratio: 2 / 3; background-color: var(--fill-2); }
+  .detail-head .info { grid-area: info; padding-top: 46px; }
+  .detail-head .scores { margin-top: 10px; }
+  .actions { grid-area: actions; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; }
+  .actions .btn { padding: 9px 6px; font-size: 13px; }
+  .detail-body { display: grid; gap: 8px; }
+  .verdict { border-left: 3px solid var(--ink); padding: 4px 0 4px 10px; margin-bottom: 12px; }
+  .verdict q { font-size: 15px; font-weight: 600; }
+  .cast { display: flex; gap: 12px; overflow-x: auto; }
+  .cast .ph { width: 56px; height: 56px; border-radius: 50%; }
+  .mine { border: 1.5px solid var(--ink); border-radius: var(--radius); padding: 12px 14px; margin-top: 14px; }
+  .facts { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
+  .facts dt { color: var(--ink-3); }
+  .facts dd { margin: 0; }
+
+  /* ---------- Reviews and spoilers ---------- */
+  .reviews-layout { display: flex; flex-direction: column; gap: 16px; }
+  .reviews-layout aside { order: -1; }
+  .review { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+  .review-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .review-foot { display: flex; gap: 16px; margin-top: 10px; }
+  .review-foot button { background: none; border: 0; padding: 0; color: var(--ink-2); font-size: 12px; text-decoration: underline; }
+  .spoiler { position: relative; }
+  .spoiler .spoiler-text { filter: blur(5px); user-select: none; }
+  .spoiler.revealed .spoiler-text { filter: none; user-select: auto; }
+  .spoiler-cover { position: absolute; inset: 0; display: grid; place-items: center; }
+  .spoiler.revealed .spoiler-cover { display: none; }
+  .spoiler-cover > div { background: var(--frame); border: 1.5px solid var(--ink); border-radius: var(--radius); padding: 8px 14px; text-align: center; }
+  .switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; }
+  .switch input { width: 20px; height: 20px; flex: none; }
+  .film-mini { display: flex; gap: 12px; align-items: center; }
+  .film-mini .ph { width: 44px; height: 66px; flex: none; }
+
+  /* ---------- Write review ---------- */
+  .form-c { max-width: 680px; margin: 0 auto; }
+  .rate-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .rate-grid button { border: 1.5px solid var(--ink-3); background: var(--frame); border-radius: var(--radius); padding: 10px 0; font-weight: 700; }
+  .rate-grid button:hover { border-color: var(--ink); }
+  .rate-grid button[aria-checked="true"] { background: var(--ink); color: var(--frame); border-color: var(--ink); }
+  .field { width: 100%; border: 1.5px solid var(--ink-3); border-radius: var(--radius); padding: 10px; background: var(--frame); }
+  textarea.field { min-height: 140px; resize: vertical; }
+  .step { font-size: 11px; font-weight: 700; color: var(--ink-3); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* ---------- Login: bottom sheet on mobile, centred dialog on desktop ---------- */
+  .dim { position: absolute; inset: 0; background: var(--overlay); z-index: 8; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 9; background: var(--frame); border-radius: 20px 20px 0 0; padding: 10px 18px 26px; }
+  .grab { width: 40px; height: 4px; border-radius: 2px; background: var(--fill-2); margin: 0 auto 14px; }
+  .fullscreen-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; background: var(--frame); z-index: 9; }
+  .spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--fill-2); border-top-color: var(--ink); margin: 0 auto 12px; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+  .toast { position: absolute; left: 14px; right: 14px; bottom: 18px; z-index: 9; background: var(--ink); color: var(--frame); border-radius: var(--radius); padding: 12px 14px; font-weight: 600; }
+
+  /* ---------- Profile ---------- */
+  .profile-layout { display: block; }
+  .profile-card { display: flex; gap: 14px; align-items: center; padding: 18px 0; }
+  .profile-card .avatar { width: 64px; height: 64px; }
+  .tabs { display: flex; border-bottom: 1px solid var(--line); }
+  .tabs button { flex: 1; background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 0; color: var(--ink-2); }
+  .tabs button[aria-selected="true"] { border-bottom-color: var(--ink); color: var(--ink); font-weight: 700; }
+
+  /* =====================================================================
+     DESKTOP LAYOUT: applies when the site is at least 760px wide.
+     ===================================================================== */
+  @container site (min-width: 760px) {
+    .c { padding: 0 32px; }
+    .only-d { display: block; }
+    .only-m { display: none !important; }
+    .h-title { font-size: 32px; }
+    .h-page { font-size: 26px; margin: 28px 0 14px; }
+    .h-sec { font-size: 18px; }
+
+    .hdr { grid-template-columns: auto auto minmax(0, 1fr) auto; grid-template-areas: "logo nav search actions"; gap: 28px; }
+    .hdr-nav { display: flex; grid-area: nav; }
+    .search-wrap { max-width: 520px; width: 100%; justify-self: center; }
+    .footer-in { flex-direction: row; justify-content: space-between; align-items: center; }
+
+    .card { width: 152px; }
+    .rail { gap: 16px; }
+    .grid { grid-template-columns: repeat(5, 1fr); gap: 18px; }
+
+    .hero > .ph { aspect-ratio: auto; height: 420px; }
+    .hero-card { left: max(32px, calc((100% - var(--content-max)) / 2 + 32px)); right: auto; bottom: 32px; width: 420px; padding: 20px; }
+    .hero-title { font-size: 30px; }
+
+    .result .ph { width: 64px; height: 96px; }
+
+    .browse-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px; }
+    .filters { display: block; }
+
+    .backdrop { aspect-ratio: auto; height: 380px; }
+    .detail-head { grid-template-columns: 200px 1fr; grid-template-areas: "poster info" "poster actions"; column-gap: 32px; row-gap: 16px; margin-top: -120px; }
+    .detail-head .info { padding-top: 132px; }
+    .actions { display: flex; align-self: start; }
+    .actions .btn { padding: 10px 22px; font-size: 14px; }
+    .detail-body { grid-template-columns: minmax(0, 1fr) 300px; gap: 48px; margin-top: 12px; }
+    .detail-body aside { padding-top: 22px; }
+    .cast .ph { width: 72px; height: 72px; }
+
+    .reviews-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 48px; align-items: start; }
+    .reviews-layout aside { order: 0; position: sticky; top: 90px; }
+
+    .rate-grid { grid-template-columns: repeat(10, 1fr); }
+
+    .sheet { left: 50%; right: auto; bottom: auto; top: 170px; transform: translateX(-50%); width: 420px; border-radius: 12px; padding: 28px; }
+    .grab { display: none; }
+    .toast { left: auto; right: 32px; bottom: 32px; width: 340px; }
+
+    .profile-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; align-items: start; padding-top: 28px; }
+    .profile-card { flex-direction: column; align-items: flex-start; padding: 0; }
+    .profile-card .avatar { width: 96px; height: 96px; }
+    .tabs button { flex: none; padding: 10px 20px; }
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc { position: static; flex-direction: row; overflow-x: auto; }
+    .toc button { white-space: nowrap; }
+  }
+</style>
+</head>
+<body data-view="desktop">
+
+<header class="page-head">
+  <div>
+    <h1>Movie Review Website: Wireframes v0.2</h1>
+    <p>A responsive website, low-fidelity and grayscale: structure and content priority only, not visual design. Built from SPEC.md. Switch between Desktop and Mobile to see the same page adapt. Use the state pills to see every state, and click inside the page to move between screens.</p>
+  </div>
+  <div class="view-toggle" role="group" aria-label="Viewport">
+    <button data-view="desktop" aria-pressed="true">Desktop</button>
+    <button data-view="mobile" aria-pressed="false">Mobile</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc" aria-label="Screens"></nav>
+
+  <main>
+
+    <!-- ============ 1. HOME ============ -->
+    <section class="screen" id="s-home" data-title="1 · Home" data-url="moviesite.com/" data-state="default">
+      <div class="screen-head"><h2>1 · Home</h2>
+        <div class="states"><span>State:</span>
+          <button data-set-state="default">Default</button>
+          <button data-set-state="loading">Loading</button>
+          <button data-set-state="error">TMDB error</button>
+        </div>
+      </div>
+      <div class="frame"><div class="frame-bar"></div><div class="site">
+        <div data-header="out"></div>
+
+        <div data-when="default">
+          <div class="hero">
+            <div class="ph">Backdrop</div>
+            <div class="hero-card">
+              <div class="muted">Featured · Trending this week</div>
+              <div class="hero-title">Film Title (2025)</div>
+              <div class="ln w90 only-d"></div><div class="ln w60 only-d"></div>
+              <div class="row" style="margin:8px 0 12px;"><span class="score score-ours">8.4 <small>1.2k ratings</small></span><span class="score score-tmdb">TMDB 7.9</span></div>
+              <div class="row">
+                <a href="#detail" data-go="detail" class="btn btn-primary">View film</a>
+                <a href="#detail" data-go="detail" class="btn only-d">▶ Trailer</a>
+              </div>
+            </div>
+          </div>
+          <div class="c">
+            <div class="row between"><h3 class="h-sec">Trending now</h3><button class="link" data-go="browse">See all</button></div>
+            <div class="rail" data-cards="9"></div>
+            <div class="row between"><h3 class="h-sec">New releases</h3><button class="link" data-go="browse">See all</button></div>
+            <div class="rail" data-cards="9"></div>
+            <div class="row between"><h3 class="h-sec">Top rated by our community</h3><button class="link" data-go="browse">See all</button></div>
+            <div class="rail" data-cards="9"></div>
+            <h3 class="h-sec">Browse by genre</h3>
+            <div class="row wrap">
+              <button class="chip" data-go="browse">Action</button><button class="chip" data-go="browse">Comedy</button>
+              <button class="chip" data-go="browse">Drama</button><button class="chip" data-go="browse">Horror</button>
+              <button class="chip" data-go="browse">Sci-Fi</button><button class="chip" data-go="browse">Thriller</button>
+              <button class="chip" data-go="browse">Romance</button><button class="chip" data-go="browse">Animation</button>
+              <button class="chip" data-go="browse">More →</button>
+            </div>
+          </div>
+        </div>
+
+        <div data-when="loading" class="skeleton">
+          <div class="hero"><div class="ph"></div></div>
+          <div class="c">
+            <div class="ln w40" style="margin-top:22px;"></div>
+            <div class="rail" data-cards="7" data-skeleton></div>
+            <div class="ln w40" style="margin-top:22px;"></div>
+            <div class="rail" data-cards="7" data-skeleton></div>
+          </div>
+        </div>
+
+        <div data-when="error" class="empty">
+          <div class="ph">!</div>
+          <p style="font-weight:700; margin:0 0 6px;">Movie info is taking a break</p>
+          <p class="muted" style="margin:0 0 14px;">We couldn't reach our film data. Try again shortly.</p>
+          <button class="btn" data-set-state="default">Retry</button>
+        </div>
+
+        <div data-footer></div>
+      </div></div>
+      <ol class="notes">
+        <li><b>Readable without login.</b> The header shows "Log in", never a login wall (Spec §2).</li>
+        <li><b>Desktop header</b> fits on one line: logo, Home and Browse, a central search bar, then Log in. <b>Mobile</b> moves the search bar to its own row.</li>
+        <li><b>Hero:</b> a full-width backdrop with an info panel. Desktop adds a plot line and a Trailer button; mobile keeps only the essentials.</li>
+        <li><b>Two scores, two looks:</b> solid = our community score, outlined = TMDB (Spec §10).</li>
+        <li><b>Rails</b> show about 7 posters on desktop and about 3 on mobile, with sideways scrolling and "See all" links to Browse. Rails further down load lazily.</li>
+        <li><b>Loading</b> uses skeleton shapes. <b>Error</b> offers Retry. The <b>footer TMDB credit</b> appears on every page (Spec §4).</li>
+      </ol>
+    </section>
+
+    <!-- ============ 2. SEARCH ============ -->
+    <section class="screen" id="s-search" data-title="2 · Search" data-url="moviesite.com/search?q=dun" data-state="typing" hidden>
+      <div class="screen-head"><h2>2 · Search</h2>
+        <div class="states"><span>State:</span>
+          <button data-set-state="typing">Typing</button>
+          <button data-set-state="results">Results</button>
+          <button data-set-state="loading">Loading</button>
+          <button data-set-state="nomatch">No match</button>
+          <button data-set-state="excluded">Excluded title</button>
+        </div>
+      </div>
+      <div class="frame"><div class="frame-bar"></div><div class="site">
+        <div data-header="out" data-query="dun" data-suggest="typing"></div>
+
+        <div class="c">
+          <div data-when="typing">
+            <div class="ln w40" style="margin-top:28px;"></div>
+            <div class="ln w60"></div>
+            <p class="muted" style="margin-top:220px;">Suggestions appear under the search bar after 2+ characters. The page behind stays as it was.</p>
+          </div>
+
+          <div data-when="results">
+            <h2 class="h-page">Results for "dun" <span class="muted">· 12 films</span></h2>
+            <div data-results="5"></div>
+          </div>
+
+          <div data-when="loading" class="skeleton">
+            <h2 class="h-page">Searching…</h2>
+            <div data-results="4" data-skeleton></div>
+          </div>
+
+          <div data-when="nomatch" class="empty">
+            <div class="ph">?</div>
+            <p style="font-weight:700; margin:0 0 6px;">No films match "dunx"</p>
+            <p class="muted" style="margin:0 0 18px;">Check the spelling, or try one of these trending films.</p>
+            <div class="rail" data-cards="5" style="justify-content:center;"></div>
+          </div>
+
+          <div data-when="excluded" class="empty">
+            <div class="ph">i</div>
+            <p style="font-weight:700; margin:0 0 6px;">This title isn't in our catalogue</p>
+            <p class="muted" style="margin:0 0 16px;">We focus on English-language films, so this title isn't here.</p>
+            <div class="row" style="justify-content:center;">
+              <button class="btn btn-primary" data-go="home">Trending now</button>
+              <button class="btn" data-go="browse">Browse genres</button>
+            </div>
+          </div>
+        </div>
+
+        <div data-footer></div>
+      </div></div>
+      <ol class="notes">
+        <li><b>Live suggestions</b> drop down under the header search bar after 2+ characters, wait until typing pauses, and show 3–5 items. Enter or "See all" goes to Results (Spec §7.2).</li>
+        <li><b>Search lives in the header on every page</b>, so there's no separate search page to navigate to first.</li>
+        <li><b>Desktop results</b> are wider rows with a plot snippet. Mobile shows poster, title, year and scores.</li>
+        <li><b>Catalogue filter applies here too:</b> only English-language films with no Indian production (Spec §4.1).</li>
+        <li><b>Excluded title</b> gets its own message, so the site looks deliberate, not broken (Flow 5). <b>No match</b> offers trending films.</li>
+      </ol>
+    </section>
+
+    <!-- ============ 3. BROWSE ============ -->
+    <section class="screen" id="s-browse" data-title="3 · Browse" data-url="moviesite.com/browse?genre=sci-fi" data-state="default" hidden>
+      <div class="screen-head"><h2>3 · Browse</h2>
+        <div class="states"><span>State:</span>
+          <button data-set-state="default">Default</button>
+          <button data-set-state="loading">Loading</button>
+          <button data-set-state="empty">No matches</button>
+        </div>
+      </div>
+      <div class="frame"><div class="frame-bar"></div><div class="site">
+        <div data-header="out"></div>
+        <div class="c">
+          <h2 class="h-page">Browse films</h2>
+          <div class="browse-layout">
+            <aside class="filters" aria-label="Filters">
+              <div class="filter-group"><h3>Genre</h3>
+                <label><input type="checkbox"> Action</label><label><input type="checkbox"> Comedy</label>
+                <label><input type="checkbox"> Drama</label><label><input type="checkbox"> Horror</label>
+                <label><input type="checkbox" checked> Sci-Fi</label><label><input type="checkbox"> Thriller</label>
+                <button class="link" style="margin-top:4px;">Show all genres</button>
+              </div>
+              <div class="filter-group"><h3>Decade</h3>
+                <select aria-label="Decade"><option>Any</option><option>2020s</option><option>2010s</option><option>2000s</option></select>
+              </div>
+              <div class="filter-group"><h3>Sort by</h3>
+                <select aria-label="Sort by"><option>Top rated</option><option>Newest</option><option>Most reviewed</option></select>
+              </div>
+              <button class="link">Clear all</button>
+            </aside>
+
+            <div>
+              <div class="row only-m" style="overflow-x:auto; margin-bottom:14px;">
+                <button class="chip" aria-pressed="true">Genre: Sci-Fi ▾</button>
+                <button class="chip">Decade ▾</button>
+                <button class="chip">Sort: Top rated ▾</button>
+              </div>
+              <div class="row between" style="margin-bottom:12px;"><span class="muted">248 films · Sci-Fi</span></div>
+
+              <div data-when="default">
+                <div class="grid" data-cards="10"></div>
+                <div style="text-align:center; margin-top:20px;"><button class="btn">Load more</button></div>
+              </div>
+              <div data-when="loading" class="skeleton"><div class="grid" data-cards="10" data-skeleton></div></div>
+              <div data-when="empty" class="empty">
+                <div class="ph">∅</div>
+                <p style="font-weight:700; margin:0 0 6px;">No films match these filters</p>
+                <button class="btn" data-set-state="default">Clear filters</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-footer></div>
+      </div></div>
+      <ol class="notes">
+        <li><b>Desktop:</b> filters in a left sidebar (genre, decade, sort) next to a 5-column poster grid. <b>Mobile:</b> filters become chips that open pickers, with a 3-column grid (Spec §7.3).</li>
+        <li><b>The URL holds the filters</b> (<code>?genre=sci-fi</code>), so a filtered view can be shared or bookmarked.</li>
+        <li><b>"Load more"</b> rather than infinite scroll, so the footer and TMDB credit stay reachable.</li>
+      </ol>
+    </section>
+
+    <!-- ============ 4. MOVIE DETAIL ============ -->
+    <section class="screen" id="s-detail" data-title="4 · Movie detail" data-url="moviesite.com/movie/438631" data-state="default" hidden>
+      <div class="screen-head"><h2>4 · Movie detail</h2>
+        <div class="states"><span>State:</span>
+          <button data-set-state="default">Logged out</button>
+          <button data-set-state="mine">My review pinned</button>
+          <button data-set-state="new">New film, no ratings</button>
+        </div>
+      </div>
+      <div class="frame"><div class="frame-bar"></div><div class="site">
+        <div data-header="out" data-when="default new"></div>
+        <div data-header="in" data-when="mine"></div>
+
+        <div class="ph backdrop">▶ Play trailer</div>
+        <div class="c">
+          <div class="detail-head">
+            <div class="ph poster">Poster</div>
+            <div class="info">
+              <h2 class="h-title">Film Title</h2>
+              <div class="muted">2024 · 2h 46m · Sci-Fi, Drama · PG-13</div>
+              <div class="row wrap scores" data-when="default mine">
+                <span class="score score-ours score-lg">8.4 <small>/10 · 1,204 ratings</small></span>
+                <span class="score score-tmdb score-lg">TMDB 7.9</span>
+              </div>
+              <div class="scores" data-when="new">
+                <div class="row wrap"><span class="score score-tmdb score-lg">Not enough ratings yet</span><span class="score score-tmdb score-lg">TMDB 7.1</span></div>
+                <p class="muted" style="margin:8px 0 0;">Be the first to rate this.</p>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" data-go="login" data-when="default new">★ Rate</button>
+              <button class="btn btn-primary" data-go="write" data-when="mine">★ 8 · Edit</button>
+              <button class="btn" data-go="login" data-when="default new">+ Watchlist</button>
+              <button class="btn" data-when="mine" aria-pressed="true">✓ Watchlist</button>
+              <button class="btn" data-go="login" data-when="default new">Seen it</button>
+              <button class="btn" data-when="mine" aria-pressed="true">✓ Seen</button>
+            </div>
+          </div>
+
+          <div class="detail-body">
+            <div>
+              <div class="mine" data-when="mine">
+                <div class="row between"><b>Your review</b><span class="score score-ours">8</span></div>
+                <p style="margin:6px 0;">“Worth it for the last 30 minutes alone.”</p>
+                <div class="row" style="gap:14px;"><button class="link" data-go="write">Edit</button><button class="link">Delete</button></div>
+              </div>
+
+              <div data-when="default mine">
+                <h3 class="h-sec">Top verdicts</h3>
+                <div class="verdict"><q>Huge, loud and somehow intimate.</q><div class="muted">Daniel · 9/10 · 48 found helpful</div></div>
+                <div class="verdict"><q>Gorgeous, but the middle drags.</q><div class="muted">Sam · 7/10 · 31 found helpful</div></div>
+                <div class="verdict"><q>See it on the biggest screen you can.</q><div class="muted">Ava · 9/10 · 22 found helpful</div></div>
+              </div>
+
+              <h3 class="h-sec">Plot</h3>
+              <div class="ln w90"></div><div class="ln w90"></div><div class="ln w60"></div>
+
+              <h3 class="h-sec">Cast</h3>
+              <div class="cast"><div class="ph"></div><div class="ph"></div><div class="ph"></div><div class="ph"></div><div class="ph"></div><div class="ph"></div><div class="ph"></div></div>
+
+              <div data-when="default mine">
+                <div class="row between"><h3 class="h-sec">Reviews</h3><button class="link" data-go="reviews">All 312 reviews →</button></div>
+                <div class="review">
+                  <div class="review-meta"><div class="avatar"></div><b>Daniel</b><span class="score score-ours">9</span></div>
+                  <div class="ln w90"></div><div class="ln w75"></div>
+                </div>
+                <div class="review spoiler">
+                  <div class="review-meta"><div class="avatar"></div><b>Mia</b><span class="score score-ours">6</span><span class="muted">· Contains spoilers</span></div>
+                  <div class="spoiler-text"><div class="ln w90"></div><div class="ln w90"></div><div class="ln w40"></div></div>
+                  <div class="spoiler-cover"><div><b>Spoiler</b><div class="muted">Reveal it in All reviews</div></div></div>
+                </div>
+              </div>
+              <div data-when="new" class="empty" style="padding:28px 0;">
+                <p style="font-weight:700; margin:0 0 10px;">No reviews yet</p>
+                <button class="btn btn-primary" data-go="login">Be the first to rate</button>
+              </div>
+            </div>
+
+            <aside>
+              <div class="box">
+                <h3 style="margin:0 0 10px; font-size:15px;">Details</h3>
+                <dl class="facts">
+                  <dt>Director</dt><dd>Director Name</dd>
+                  <dt>Released</dt><dd>1 Mar 2024</dd>
+                  <dt>Runtime</dt><dd>2h 46m</dd>
+                  <dt>Genres</dt><dd>Sci-Fi, Drama</dd>
+                  <dt>Language</dt><dd>English</dd>
+                </dl>
+              </div>
+              <h3 class="h-sec">Similar films</h3>
+              <div data-results="3"></div>
+            </aside>
+          </div>
+        </div>
+        <div data-footer></div>
+      </div></div>
+      <ol class="notes">
+        <li><b>Desktop:</b> a wide backdrop, with the poster overlapping it on the left. Title, scores and actions sit beside the poster. The body has two columns: main content on the left, and a Details box plus Similar films on the right (Spec §7.4).</li>
+        <li><b>Mobile:</b> the same content stacks in priority order: identity → scores → actions → verdicts → plot → cast → reviews → details.</li>
+        <li><b>Rate is the primary action.</b> Watchlist and Seen it come second. Logged out, any action opens the login dialog (screen 7). Click "Rate" to see it.</li>
+        <li><b>My review pinned:</b> once I've reviewed, my card sits above everyone else's, with Edit and Delete.</li>
+        <li><b>New film:</b> under 3 ratings, we show "Not enough ratings yet" plus the TMDB score, so the page is never empty (cold start).</li>
+        <li><b>Spoilers in the preview</b> stay covered. Revealing happens in All reviews.</li>
+      </ol>
+    </section>
+
+    <!-- ============ 5. ALL REVIEWS ============ -->
+    <section class="screen" id="s-reviews" data-title="5 · All reviews" data-url="moviesite.com/movie/438631/reviews" data-state="default" hidden>
+      <div class="screen-head"><h2>5 · All reviews</h2>
+        <div class="states"><span>Try: click "Reveal", or switch on "I've seen it"</span></div>
+      </div>
+      <div class="frame"><div class="frame-bar"></div><div class="site">
+        <div data-header="out"></div>
+        <div class="c">
+          <div style="margin-top:18px;"><button class="link" data-go="detail">← Back to Film Title</button></div>
+          <h2 class="h-page" style="margin-top:10px;">Reviews <span class="muted">(312)</span></h2>
+          <div class="reviews-layout">
+            <div>
+              <div class="row" style="overflow-x:auto; margin-bottom:14px;" role="group" aria-label="Sort reviews">
+                <button class="chip" aria-pressed="true" data-sort>Most helpful</button>
+                <button class="chip" aria-pressed="false" data-sort>Newest</button>
+                <button class="chip" aria-pressed="false" data-sort>Highest</button>
+                <button class="chip" aria-pressed="false" data-sort>Lowest</button>
+              </div>
+
+              <div class="review">
+                <div class="review-meta"><div class="avatar"></div><b>Daniel</b><span class="score score-ours">9</span><span class="muted">· 2 days ago</span></div>
+                <p style="margin:0 0 6px; font-weight:600;">“Huge, loud and somehow intimate.”</p>
+                <div class="ln w90"></div><div class="ln w90"></div><div class="ln w60"></div>
+                <div class="review-foot"><button>Helpful (48)</button><button>Report spoiler</button></div>
+              </div>
+
+              <div class="review spoiler" data-spoiler>
+                <div class="review-meta"><div class="avatar"></div><b>Mia</b><span class="score score-ours">6</span><span class="muted">· 5 days ago · Contains spoilers</span></div>
+                <div class="spoiler-text">
+                  <p style="margin:0 0 6px; font-weight:600;">“The twist with the father didn't land.”</p>
+                  <div class="ln w90"></div><div class="ln w75"></div>
+                </div>
+                <div class="spoiler-cover">
+                  <div data-cover>
+                    <b>Contains spoilers</b><br>
+                    <button class="btn" style="margin-top:6px; padding:5px 14px;" data-reveal>Reveal</button>
+                  </div>
+                  <div data-confirm hidden>
+                    <b>Reveal spoiler?</b>
+                    <div class="row" style="margin-top:6px; justify-content:center;">
+                      <button class="btn" style="padding:5px 14px;" data-cancel>Cancel</button>
+                      <button class="btn btn-primary" style="padding:5px 14px;" data-confirm-reveal>Reveal</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-foot"><button>Helpful (12)</button><button>Report spoiler</button></div>
+              </div>
+
+              <div class="review">
+                <div class="review-meta"><div class="avatar"></div><b>Sam</b><span class="score score-ours">7</span><span class="muted">· 1 week ago</span></div>
+                <p style="margin:0; font-weight:600;">“Gorgeous, but the middle drags.”</p>
+                <div class="review-foot"><button>Helpful (31)</button><button>Report spoiler</button></div>
+              </div>
+
+              <div style="text-align:center;"><button class="btn">Load more reviews</button></div>
+            </div>
+
+            <aside>
+              <div class="box">
+                <div class="film-mini">
+                  <div class="ph"></div>
+                  <div><b>Film Title</b><div class="muted">2024</div>
+                    <div class="row" style="margin-top:6px;"><span class="score score-ours">8.4</span><span class="score score-tmdb">TMDB 7.9</span></div>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block only-d" style="margin-top:14px;" data-go="login">★ Rate this film</button>
+              </div>
+              <label class="switch" style="margin-top:12px;"><span><b>I've seen it</b><br><span class="muted">Show all spoilers for this film</span></span><input type="checkbox" data-seen></label>
+            </aside>
+          </div>
+        </div>
+        <div data-footer></div>
+      </div></div>
+      <ol class="notes">
+        <li><b>Desktop:</b> reviews on the left, and a sticky side panel on the right with the film, its scores, a Rate button and the "I've seen it" switch. <b>Mobile:</b> the panel moves above the list.</li>
+        <li><b>Sort</b> defaults to Most helpful (Spec §7.6).</li>
+        <li><b>Spoilers are blurred by default.</b> Reveal asks for confirmation first, so a mis-click doesn't spoil the film.</li>
+        <li><b>"I've seen it"</b> reveals every spoiler on this film. For a logged-in user it's the same as Seen it on the detail page (Flow 3).</li>
+        <li><b>A verdict-only review</b> (Sam) is valid. <b>Helpful and Report spoiler</b> need login.</li>
+      </ol>
+    </section>
+
+    <!-- ============ 6. WRITE REVIEW ============ -->
+    <section class="screen" id="s-write" data-title="6 · Write review" data-url="moviesite.com/movie/438631/review" data-state="default" hidden>
+      <div class="screen-head"><h2>6 · Write / edit review</h2>
+        <div class="states"><span>State:</span>
+          <button data-set-state="default">Default</button>
+          <button data-set-state="failed">Post failed</button>
+          <button data-set-state="offline">Offline</button>
+        </div>
+      </div>
+      <div class="frame"><div class="frame-bar"></div><div class="site">
+        <div data-header="in"></div>
+        <div class="c"><div class="form-c">
+          <div style="margin-top:18px;"><button class="link" data-go="detail">← Back to Film Title</button></div>
+          <div class="film-mini" style="margin-top:14px;"><div class="ph"></div><div><h2 class="h-page" style="margin:0;">Your review</h2><div class="muted">Film Title · 2024</div></div></div>
+
+          <div class="banner" data-when="failed">Couldn't post your review. Your text is kept. <button class="link">Retry</button></div>
+          <div class="banner" data-when="offline">You're offline. Your draft is saved and will be ready when you reconnect.</div>
+
+          <hr class="divider">
+          <div class="step">Step 1 · Required</div>
+          <div class="row between"><h3 class="h-sec" style="margin-top:4px;">Your score</h3><span class="muted" data-saved hidden>Saved ✓</span></div>
+          <div class="rate-grid" role="radiogroup" aria-label="Score from 1 to 10"></div>
+
+          <hr class="divider">
+          <div class="step">Step 2 · Optional</div>
+          <h3 class="h-sec" style="margin-top:4px;">Sum it up in a line</h3>
+          <input class="field" maxlength="120" data-count placeholder="e.g. Worth it for the ending">
+          <div class="muted" style="text-align:right; margin-top:4px;"><span data-counter>0</span>/120</div>
+
+          <hr class="divider">
+          <div class="step">Step 3 · Optional</div>
+          <button class="link" data-expand style="margin-top:8px;">+ Add a longer review</button>
+          <div data-long hidden>
+            <textarea class="field" maxlength="5000" data-count placeholder="What worked, what didn't…" style="margin-top:8px;"></textarea>
+            <div class="muted" style="text-align:right; margin-top:4px;"><span data-counter>0</span>/5,000</div>
+          </div>
+
+          <hr class="divider">
+          <label class="switch"><span><b>Contains spoilers</b><br><span class="muted">Your review will be blurred until readers choose to reveal it</span></span><input type="checkbox"></label>
+
+          <div class="row" style="margin-top:20px; justify-content:flex-end;">
+            <button class="btn" data-go="detail">Cancel</button>
+            <button class="btn btn-primary" data-post disabled>Post review</button>
+          </div>
+          <p class="muted" style="text-align:right;">Your score is already saved. Posting adds your words.</p>
+        </div></div>
+        <div data-footer></div>
+      </div></div>
+      <ol class="notes">
+        <li><b>Its own page,</b> with a centred column about 680px wide on desktop, because writing needs focus. Mobile goes full width (Spec §7.5).</li>
+        <li><b>Score saves the moment it's clicked.</b> A rating alone counts. Click a number to see "Saved ✓". Desktop shows 1–10 in one row; mobile uses two rows of five.</li>
+        <li><b>Verdict and long review are optional</b>, but the verdict gets a direct prompt. Limits: 120 and 5,000 characters, enforced on the server too.</li>
+        <li><b>Post failed / offline:</b> the text is never lost and Retry is offered (Spec §9). <b>Editing</b> reuses this page, pre-filled.</li>
+      </ol>
+    </section>
+
+    <!-- ============ 7. LOGIN INTERRUPTION ============ -->
+    <section class="screen" id="s-login" data-title="7 · Login prompt" data-url="moviesite.com/movie/438631" data-state="sheet" hidden>
+      <div class="screen-head"><h2>7 · Login interruption</h2>
+        <div class="states"><span>Step:</span>
+          <button data-set-state="sheet">1 · Prompt</button>
+          <button data-set-state="returning">2 · Returning</button>
+          <button data-set-state="done">3 · Done</button>
+        </div>
+      </div>
+      <div class="frame"><div class="frame-bar"></div><div class="site" style="min-height:760px;">
+        <div data-header="out" data-when="sheet returning"></div>
+        <div data-header="in" data-when="done"></div>
+        <div class="ph backdrop">▶ Play trailer</div>
+        <div class="c">
+          <div class="detail-head">
+            <div class="ph poster">Poster</div>
+            <div class="info">
+              <h2 class="h-title">Film Title</h2>
+              <div class="muted">2024 · 2h 46m · Sci-Fi, Drama</div>
+              <div class="row wrap scores"><span class="score score-ours score-lg">8.4 <small>/10</small></span><span class="score score-tmdb score-lg">TMDB 7.9</span></div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" data-when="sheet returning">★ Rate</button>
+              <button class="btn btn-primary" data-when="done">★ 8 · Edit</button>
+              <button class="btn">+ Watchlist</button><button class="btn">Seen it</button>
+            </div>
+          </div>
+          <div style="margin-top:24px;"><div class="ln w90"></div><div class="ln w75"></div><div class="ln w90"></div></div>
+        </div>
+
+        <div data-when="sheet">
+          <div class="dim"></div>
+          <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+            <div class="grab"></div>
+            <div class="row between" style="align-items:flex-start;">
+              <h3 id="sheet-title" style="margin:0 0 6px; font-size:18px;">Sign in to rate this film</h3>
+              <button class="link only-d" data-go="detail" aria-label="Close" style="text-decoration:none; font-size:18px; line-height:1;">×</button>
+            </div>
+            <p class="muted" style="margin:0 0 18px;">You'll come straight back here, and your rating will be saved.</p>
+            <button class="btn btn-primary btn-block" data-set-state="returning">Log in</button>
+            <button class="btn btn-block" style="margin-top:8px;" data-set-state="returning">Create account</button>
+            <button class="link only-m" style="display:block; margin:14px auto 0;" data-go="detail">Not now</button>
+          </div>
+        </div>
+
+        <div data-when="returning" class="fullscreen-msg">
+          <div><div class="spinner" aria-hidden="true"></div><b>Signing you in…</b><div class="muted">Taking you back to Film Title</div></div>
+        </div>
+
+        <div data-when="done"><div class="toast" role="status">Rated 8/10 ✓ <span style="font-weight:400;">· <u>Add a verdict?</u></span></div></div>
+        <div data-footer></div>
+      </div></div>
+      <ol class="notes">
+        <li><b>Desktop: a centred dialog. Mobile: a bottom sheet.</b> Either way the film stays visible behind it, so the user keeps their context (Flow 4).</li>
+        <li><b>The copy names the action</b> ("to rate this film", "to save to watchlist"), so the reason is clear.</li>
+        <li><b>Hosted login:</b> the user briefly leaves the site. The pending action (for example "rate 8") is saved first.</li>
+        <li><b>"Signing you in…"</b> covers the page reload on return.</li>
+        <li><b>Done:</b> back on the same film and scroll spot, with the action already completed and a toast confirming it. Having to redo it counts as a bug.</li>
+      </ol>
+    </section>
+
+    <!-- ============ 8. PROFILE ============ -->
+    <section class="screen" id="s-profile" data-title="8 · Profile" data-url="moviesite.com/me" data-state="own" hidden>
+      <div class="screen-head"><h2>8 · Profile</h2>
+        <div class="states"><span>State:</span>
+          <button data-set-state="own">My profile</button>
+          <button data-set-state="public">Someone else's</button>
+          <button data-set-state="empty">New user, empty</button>
+        </div>
+      </div>
+      <div class="frame"><div class="frame-bar"></div><div class="site">
+        <div data-header="in"></div>
+        <div class="c">
+          <div class="profile-layout">
+            <div class="profile-card">
+              <div class="avatar"></div>
+              <div>
+                <h2 class="h-page" style="margin:0;" data-when="own empty">You</h2>
+                <h2 class="h-page" style="margin:0;" data-when="public">Daniel</h2>
+                <div class="muted" data-when="own public">142 ratings · 37 reviews · member since 2026</div>
+                <div class="muted" data-when="empty">0 ratings · 0 reviews</div>
+                <button class="btn only-d" style="margin-top:14px;" data-when="own empty">Edit profile</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="tabs" role="tablist">
+                <button role="tab" aria-selected="true">Ratings</button>
+                <button role="tab" aria-selected="false">Reviews</button>
+                <button role="tab" aria-selected="false" data-when="own empty">Watchlist</button>
+              </div>
+              <div data-when="own public"><div data-results="5" data-mine></div></div>
+              <div data-when="empty" class="empty">
+                <div class="ph">★</div>
+                <p style="font-weight:700; margin:0 0 6px;">No ratings yet</p>
+                <p class="muted" style="margin:0 0 14px;">Find a film you've seen and rate it.</p>
+                <button class="btn btn-primary" data-go="search">Search films</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-footer></div>
+      </div></div>
+      <ol class="notes">
+        <li><b>Desktop:</b> a profile card on the left, with tabs and lists on the right. <b>Mobile:</b> the card sits on top.</li>
+        <li><b>Own vs public:</b> the Watchlist tab and Edit profile only appear on your own profile, because they're private (Spec §6).</li>
+        <li><b>Empty state</b> gives a next step (Search), not just "nothing here".</li>
+        <li><b>Not in MVP:</b> follow, lists, taste match (Spec §3, Later).</li>
+      </ol>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Repeated chunks (header, footer, cards, result rows) are generated so each screen's markup stays readable.
+  const suggestionsHtml = (when) => `
+    <div class="suggest" role="listbox" aria-label="Suggestions" data-when="${when}">
+      ${[["Film Title", 2021], ["Film Title Part Two", 2024], ["Another Film", 1984]].map(([title, year]) => `
+        <a href="#detail" data-go="detail" class="result"><div class="ph"></div>
+          <div class="result-body"><div style="font-weight:600;">${title}</div><div class="muted">${year}</div></div></a>`).join("")}
+      <button class="link" style="display:block; padding:8px 12px;" data-set-state="results">See all results for "dun"</button>
+    </div>`;
+
+  const headerHtml = ({ header, query, suggest, when }) => `
+    <div class="app-header"${when ? ` data-when="${when}"` : ""}>
+      <div class="c hdr">
+        <a href="#home" data-go="home" class="logo">LOGO</a>
+        <nav class="hdr-nav" aria-label="Main"><a href="#home" data-go="home">Home</a><a href="#browse" data-go="browse">Browse</a></nav>
+        <div class="search-wrap">
+          <label class="search"><span aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Search films" value="${query || ""}" aria-label="Search films">
+          </label>
+          ${suggest ? suggestionsHtml(suggest) : ""}
+        </div>
+        <div class="hdr-actions">
+          <a href="#browse" data-go="browse" class="link only-m" style="text-decoration:none;">Browse</a>
+          ${header === "in"
+            ? '<button class="avatar" data-go="profile" aria-label="My profile"></button>'
+            : '<button class="btn" style="padding:5px 14px;" data-go="login">Log in</button>'}
+        </div>
+      </div>
+    </div>`;
+
+  const footerHtml = `
+    <footer class="app-footer"><div class="c footer-in">
+      <div class="row">
+        <div class="ph tmdb-logo">TMDB logo</div>
+        <div>This product uses the TMDB API but is not endorsed or certified by TMDB.</div>
+      </div>
+      <div class="row" style="gap:16px;"><span>About</span><span>Terms</span><span>Privacy</span></div>
+    </div></footer>`;
+
+  const cardHtml = (index, isSkeleton) => isSkeleton
+    ? `<div class="card"><div class="ph"></div><div class="ln w90"></div><div class="ln w40"></div></div>`
+    : `<a href="#detail" data-go="detail" class="card"><div class="ph">Poster</div>
+         <div class="t">Film Title ${index + 1}</div>
+         <div class="row" style="gap:4px; margin-top:4px;"><span class="score score-ours">8.${index}</span><span class="score score-tmdb">7.${index}</span></div></a>`;
+
+  const resultHtml = (index, isSkeleton, isMine) => isSkeleton
+    ? `<div class="result"><div class="ph"></div><div class="result-body"><div class="ln w60"></div><div class="ln w40"></div><div class="ln w90 only-d"></div></div></div>`
+    : `<a href="#detail" data-go="detail" class="result"><div class="ph"></div>
+         <div class="result-body">
+           <div style="font-weight:600;">Film Title ${index + 1}</div>
+           <div class="muted">${2024 - index * 7}${isMine ? " · rated 2 days ago" : " · Sci-Fi, Drama"}</div>
+           <div class="row" style="margin-top:6px;">
+             ${isMine ? `<span class="score score-ours">${9 - index}</span>`
+                      : `<span class="score score-ours">8.${index}</span><span class="score score-tmdb">TMDB 7.${index}</span>`}
+           </div>
+           ${isMine ? "" : '<div class="ln w75 only-d"></div>'}
+         </div></a>`;
+
+  document.querySelectorAll("[data-header]").forEach((el) => {
+    el.outerHTML = headerHtml({
+      header: el.dataset.header, query: el.dataset.query, suggest: el.dataset.suggest, when: el.dataset.when,
+    });
+  });
+  document.querySelectorAll("[data-footer]").forEach((el) => { el.outerHTML = footerHtml; });
+  document.querySelectorAll("[data-cards]").forEach((el) => {
+    el.innerHTML = Array.from({ length: Number(el.dataset.cards) }, (_, i) =>
+      cardHtml(i, el.hasAttribute("data-skeleton"))).join("");
+  });
+  document.querySelectorAll("[data-results]").forEach((el) => {
+    el.innerHTML = Array.from({ length: Number(el.dataset.results) }, (_, i) =>
+      resultHtml(i, el.hasAttribute("data-skeleton"), el.hasAttribute("data-mine"))).join("");
+  });
+  document.querySelector(".rate-grid").innerHTML = Array.from({ length: 10 }, (_, i) =>
+    `<button role="radio" aria-checked="false" data-score="${i + 1}">${i + 1}</button>`).join("");
+
+  // ---------- Screens, URLs and the Desktop/Mobile toggle ----------
+  const screens = [...document.querySelectorAll(".screen")];
+  screens.forEach((s) => {
+    s.querySelector(".frame-bar").innerHTML =
+      `<span class="dots" aria-hidden="true">● ● ●</span><span class="url">${s.dataset.url}</span>`;
+  });
+
+  const toc = document.querySelector(".toc");
+  toc.innerHTML = screens.map((s) => `<button data-go="${s.id.slice(2)}">${s.dataset.title}</button>`).join("");
+
+  function showScreen(name) {
+    const target = document.getElementById("s-" + name) ? name : "home";
+    screens.forEach((s) => { s.hidden = s.id !== "s-" + target; });
+    toc.querySelectorAll("button").forEach((b) => b.setAttribute("aria-current", String(b.dataset.go === target)));
+    history.replaceState(null, "", "#" + target);
+  }
+
+  function setState(screen, state) {
+    screen.dataset.state = state;
+    screen.querySelectorAll("[data-when]").forEach((el) => {
+      el.hidden = !el.dataset.when.split(" ").includes(state);
+    });
+    screen.querySelectorAll(".states [data-set-state]").forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.setState === state)));
+  }
+  screens.forEach((s) => setState(s, s.dataset.state));
+
+  document.querySelectorAll(".view-toggle button").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.body.dataset.view = button.dataset.view;
+      document.querySelectorAll(".view-toggle button").forEach((b) =>
+        b.setAttribute("aria-pressed", String(b === button)));
+    });
+  });
+
+  // ---------- Interactions inside the page ----------
+  document.addEventListener("click", (event) => {
+    const t = event.target;
+
+    const go = t.closest("[data-go]");
+    if (go) { event.preventDefault(); showScreen(go.dataset.go); return; }
+
+    const stateButton = t.closest("[data-set-state]");
+    if (stateButton) { setState(stateButton.closest(".screen"), stateButton.dataset.setState); return; }
+
+    const scoreButton = t.closest("[data-score]");
+    if (scoreButton) {
+      scoreButton.parentElement.querySelectorAll("button").forEach((b) =>
+        b.setAttribute("aria-checked", String(b === scoreButton)));
+      document.querySelector("[data-saved]").hidden = false;
+      document.querySelector("[data-post]").disabled = false;
+      return;
+    }
+
+    const spoiler = t.closest("[data-spoiler]");
+    if (spoiler && t.closest("[data-reveal]")) {
+      spoiler.querySelector("[data-cover]").hidden = true;
+      spoiler.querySelector("[data-confirm]").hidden = false;
+      return;
+    }
+    if (spoiler && t.closest("[data-cancel]")) {
+      spoiler.querySelector("[data-cover]").hidden = false;
+      spoiler.querySelector("[data-confirm]").hidden = true;
+      return;
+    }
+    if (spoiler && t.closest("[data-confirm-reveal]")) { spoiler.classList.add("revealed"); return; }
+
+    if (t.closest("[data-expand]")) {
+      t.closest("[data-expand]").hidden = true;
+      document.querySelector("[data-long]").hidden = false;
+      return;
+    }
+
+    const sortChip = t.closest("[data-sort]");
+    if (sortChip) {
+      sortChip.parentElement.querySelectorAll("[data-sort]").forEach((c) =>
+        c.setAttribute("aria-pressed", String(c === sortChip)));
+      return;
+    }
+
+    const tab = t.closest('[role="tab"]');
+    if (tab) {
+      tab.parentElement.querySelectorAll('[role="tab"]').forEach((b) =>
+        b.setAttribute("aria-selected", String(b === tab)));
+    }
+  });
+
+  document.addEventListener("input", (event) => {
+    if (!event.target.matches("[data-count]")) return;
+    const counter = event.target.parentElement.querySelector("[data-counter]");
+    if (counter) counter.textContent = event.target.value.length.toLocaleString();
+  });
+
+  document.querySelector("[data-seen]").addEventListener("change", (event) => {
+    document.querySelectorAll("#s-reviews [data-spoiler]").forEach((s) =>
+      s.classList.toggle("revealed", event.target.checked));
+  });
+
+  showScreen(location.hash.slice(1) || "home");
+</script>
+</body>
+</html>

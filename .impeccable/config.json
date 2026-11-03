@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "/Users/sunny1585/Movie Review Website/wireframes.html"
+        ],
+        "createdAt": "2026-11-03T11:39:48.757Z",
+        "reason": "Low-fi grayscale wireframe; tight pills/badges are placeholders. User asked for rough wireframes only, no visual design (this session)."
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "/Users/sunny1585/Movie Review Website/wireframes.html"
+        ],
+        "createdAt": "2026-11-03T11:39:48.775Z",
+        "reason": "Low-fi grayscale wireframe; type scale intentionally undesigned. User asked for rough wireframes only, no visual design (this session)."
+      }
+    ]
+  }
+}
