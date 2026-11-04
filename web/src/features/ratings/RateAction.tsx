@@ -1,18 +1,21 @@
 import { Star } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../app/providers/AuthProvider";
-import { AppLink } from "../../app/router/navigation";
+import { AppLink, useNavigation } from "../../app/router/navigation";
 import { Dialog } from "../../shared/ui/Dialog";
+import { LoginForm } from "../auth/LoginForm";
 
 /**
- * The film page's one primary action. Signed out, it asks to sign in where
- * the visitor is (SPEC §7.8) and comes back to this film's rating screen, so
- * nobody has to find the film again (Flow 4).
+ * The film page's one primary action. Signed out, it opens a sign-in dialog
+ * right here (SPEC §7.8): logging in closes it and carries on to this film's
+ * rating screen, so nobody leaves the page or has to find the film again
+ * (Flow 4). "Create an account" saves the same destination for after
+ * activation.
  */
 export function RateAction({ tmdbMovieId, filmTitle, hasRated }: { tmdbMovieId: number; filmTitle: string; hasRated: boolean }) {
-  const { status, login } = useAuth();
+  const { status } = useAuth();
+  const { navigate } = useNavigation();
   const [isPromptOpen, setIsPromptOpen] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
   const ratePath = `/movie/${tmdbMovieId}/review`;
   const label = hasRated ? "Change your rating" : "Rate";
 
@@ -23,16 +26,6 @@ export function RateAction({ tmdbMovieId, filmTitle, hasRated }: { tmdbMovieId: 
         {label}
       </AppLink>
     );
-  }
-
-  async function handleSignIn() {
-    setIsRedirecting(true);
-    try {
-      await login(ratePath);
-    } catch {
-      // The browser only stays when the redirect could not start.
-      setIsRedirecting(false);
-    }
   }
 
   return (
@@ -47,19 +40,18 @@ export function RateAction({ tmdbMovieId, filmTitle, hasRated }: { tmdbMovieId: 
         Rate
       </button>
       <Dialog onClose={() => setIsPromptOpen(false)} open={isPromptOpen} title="Sign in to rate this film">
-        <p className="dialog__text">
-          You'll come straight back to rate {filmTitle}. Browsing and reading never need an account.
-        </p>
-        <div className="dialog__actions">
-          {/* autoFocus is honoured by the native <dialog> when it opens, so focus
-              lands on the action people came for rather than the close button. */}
-          <button aria-disabled={isRedirecting} autoFocus className="button button--primary" onClick={isRedirecting ? undefined : () => void handleSignIn()} type="button">
-            {isRedirecting ? "Opening sign-in…" : "Log in or sign up"}
-          </button>
-          <button className="button button--secondary" onClick={() => setIsPromptOpen(false)} type="button">
-            Not now
-          </button>
-        </div>
+        <p className="dialog__text">Log in to rate {filmTitle}. Browsing and reading never need an account.</p>
+        {/* Mounted only while open, so a typed password never outlives the dialog. */}
+        {isPromptOpen && (
+          <LoginForm
+            autoFocus
+            onSuccess={() => {
+              setIsPromptOpen(false);
+              navigate(ratePath);
+            }}
+            returnTo={ratePath}
+          />
+        )}
       </Dialog>
     </>
   );

@@ -2,6 +2,7 @@ import { m } from "motion/react";
 import type { ReactNode } from "react";
 import { distance, duration, ease } from "../../lib/motion";
 import { cn } from "../../lib/utils";
+import { ToastHost } from "../../shared/ui/Toast";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 
@@ -34,6 +35,7 @@ export function AppShell({ children, pageKey, animateEnter = true, fullBleed = f
         </m.div>
       </main>
       <SiteFooter />
+      <ToastHost />
     </>
   );
 }

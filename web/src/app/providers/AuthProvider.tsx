@@ -1,13 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { fetchSessionClaims, logout as endSession, loginWithPassword, onSessionExpired, startLogin } from "../../lib/blocks/auth";
+import { fetchSessionClaims, logout as endSession, loginWithPassword, onSessionExpired } from "../../lib/blocks/auth";
+import type { LoginResult } from "../../lib/blocks/auth";
 
 type AuthStatus = "authenticated" | "loading" | "unauthenticated";
 
 type AuthContextValue = {
   claims: Record<string, unknown> | undefined;
-  login: (returnTo?: string) => Promise<void>;
-  signIn: (params: { email: string; password: string; rememberMe?: boolean }) => Promise<void>;
+  signIn: (params: { email: string; password: string; rememberMe: boolean }) => Promise<LoginResult>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   status: AuthStatus;
@@ -26,9 +26,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // The session's source of truth is IAM's GET /iam/v4/auth/me
   // (blocksClient.auth.userInfo()), not a token this app can inspect --
-  // the default hosted login flow sets the session as a Secure, httpOnly
-  // cookie that never reaches this app's JS, so a successful call here is
-  // what "signed in" means, not the presence of a cached access token.
+  // IAM keeps the session in a Secure, httpOnly cookie that never reaches
+  // this app's JS, so a successful call here is what "signed in" means,
+  // not the presence of an in-memory access token.
   const refresh = useCallback(async () => {
     const sessionClaims = await fetchSessionClaims();
     setClaims(sessionClaims);
@@ -55,15 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // session server-side, this just gets the UI to notice and redirect.
   useEffect(() => onSessionExpired(() => void refresh()), [refresh]);
 
-  const login = useCallback(async (returnTo?: string) => {
-    await startLogin(returnTo);
-  }, []);
-
-  // Resolves only once the session is established and `status` has flipped,
-  // so the caller can navigate straight afterwards without racing the guard.
-  const signIn = useCallback(async (params: { email: string; password: string; rememberMe?: boolean }) => {
-    await loginWithPassword(params);
-    await refresh();
+  // On success, resolves only once `status` has flipped, so the caller can
+  // navigate straight afterwards without racing the guard.
+  const signIn = useCallback(async (params: { email: string; password: string; rememberMe: boolean }) => {
+    const result = await loginWithPassword(params);
+    if (result.ok) await refresh();
+    return result;
   }, [refresh]);
 
   const logout = useCallback(async () => {
@@ -73,12 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => ({
     claims,
-    login,
     logout,
     refresh,
     signIn,
     status
-  }), [claims, login, logout, refresh, signIn, status]);
+  }), [claims, logout, refresh, signIn, status]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

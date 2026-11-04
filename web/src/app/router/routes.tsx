@@ -1,5 +1,8 @@
 import type { ReactElement } from "react";
-import { CallbackPage } from "../../features/auth/CallbackPage";
+import { ActivatePage } from "../../features/auth/ActivatePage";
+import { ForgotPasswordPage } from "../../features/auth/ForgotPasswordPage";
+import { LoginPage } from "../../features/auth/LoginPage";
+import { ResetPasswordPage } from "../../features/auth/ResetPasswordPage";
 import { SignUpPage } from "../../features/auth/SignUpPage";
 import { BrowsePage } from "../../features/browse/BrowsePage";
 import { HomePage } from "../../features/home/HomePage";
@@ -30,7 +33,11 @@ type Route = {
 const routes: Route[] = [
   { pattern: /^\/$/, fullBleed: true, render: () => <HomePage /> },
   { pattern: /^\/search$/, render: (_, search) => <SearchPage query={search.get("q") ?? ""} /> },
-  { pattern: /^\/signup$/, fullBleed: true, render: () => <SignUpPage /> },
+  { pattern: /^\/login$/, fullBleed: true, render: (_, search) => <LoginPage returnTo={search.get("returnTo")} /> },
+  { pattern: /^\/signup$/, fullBleed: true, render: (_, search) => <SignUpPage returnTo={search.get("returnTo")} /> },
+  { pattern: /^\/forgot-password$/, fullBleed: true, render: (_, search) => <ForgotPasswordPage returnTo={search.get("returnTo")} /> },
+  { pattern: /^\/reset-password$/, fullBleed: true, render: (_, search) => <ResetPasswordPage code={search.get("code")} key={search.get("code")} /> },
+  { pattern: /^\/activate$/, fullBleed: true, render: (_, search) => <ActivatePage code={search.get("code")} key={search.get("code")} /> },
   { pattern: /^\/browse$/, render: (_, search) => <BrowsePage search={search} /> },
   { pattern: /^\/movie\/(\d+)\/reviews$/, render: () => <ReviewsPage /> },
   { pattern: /^\/movie\/(\d+)\/review$/, requiresAuth: true, render: ([id]) => <RatePage key={id} tmdbMovieId={Number(id)} /> },
@@ -59,8 +66,6 @@ function resolve(path: string, search: string): { element: ReactElement; require
 
 export function AppRouter() {
   const { path, search } = useNavigation();
-
-  if (path === "/login/callback") return <CallbackPage />;
 
   const { element, requiresAuth, fullBleed } = resolve(path, search);
   // Keyed by path only: changing a Browse filter or search term updates the

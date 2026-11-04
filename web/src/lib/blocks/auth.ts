@@ -1,17 +1,15 @@
 import { blocksClient } from "./client";
-import { blocksConfig } from "./config";
 import { isJwtExpired } from "./jwt";
 
-// IAM's hosted IdP flow sets the session as a Secure, httpOnly cookie by
-// default -- this app never sees that token and must not try to. Bearer
-// tokens below are only populated when a tenant's OIDC config explicitly
-// opts into returning tokens in the response body instead of a cookie; in
-// the default cookie flow every function below simply no-ops around them.
-const TOKEN_KEY = "blocks-app:access-token";
+// Limereel signs people in on its own pages (SPEC §7.9) through IAM's
+// password login, which returns tokens in the response body and also sets
+// IAM's Secure, httpOnly session cookie. Tokens live in memory only: a
+// reload drops them and the cookie re-establishes the session, so nothing
+// an injected script could steal is ever written to browser storage.
+// These keys are only ever read (a host-seeded marker) or cleared (values
+// an earlier build of this app may have left behind).
+const LEGACY_TOKEN_KEY = "blocks-app:access-token";
 const REFRESH_TOKEN_KEY = "blocks-app:refresh-token";
-const RETURN_KEY = "blocks-app:oidc-return-to";
-
-export type CallbackResult = { ok: true; returnTo: string } | { ok: false; message: string };
 
 let cachedAccessToken: string | undefined;
 let cachedRefreshToken: string | undefined;
@@ -34,21 +32,11 @@ function notifySessionExpired(): void {
 
 function getAccessToken(): string | undefined {
   if (cachedAccessToken && !isJwtExpired(cachedAccessToken)) return cachedAccessToken;
-
-  const stored = sessionStorage.getItem(TOKEN_KEY);
-  if (stored && !isJwtExpired(stored)) {
-    cachedAccessToken = stored;
-    return stored;
-  }
-
   return undefined;
 }
 
 // Never written to storage by this app, deliberately: a refresh token is
 // long-lived, and anything readable from JS is readable by an XSS payload.
-// The access token is short-lived, so that one is persisted to keep a
-// reload from bouncing the user, and IAM's httpOnly session cookie
-// re-establishes the session once it expires.
 //
 // The stored value is still *read* as a fallback, for a host that can
 // re-establish a session but cannot reach this module's variables -- a
@@ -64,17 +52,15 @@ function getRefreshToken(): string | undefined {
   return seeded ?? undefined;
 }
 
-function persistTokens(accessToken: string, refreshToken?: string): void {
+function keepTokens(accessToken: string, refreshToken?: string): void {
   cachedAccessToken = accessToken;
-  sessionStorage.setItem(TOKEN_KEY, accessToken);
-
   if (refreshToken) cachedRefreshToken = refreshToken;
 }
 
 function clearLocalTokens(): void {
   cachedAccessToken = undefined;
   cachedRefreshToken = undefined;
-  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(LEGACY_TOKEN_KEY);
   // This app never writes that key, but a host may have seeded it (see
   // getRefreshToken) and an earlier build of this app may have persisted a
   // real token there -- either way it must not survive a sign-out.
@@ -142,7 +128,7 @@ async function refreshAccessToken(refreshToken: string): Promise<string | undefi
   // The identity provider may not rotate the refresh token on every call --
   // keep the previous one instead of overwriting a working token with undefined.
   const nextRefreshToken = response.refresh_token ?? response.refreshToken ?? refreshToken;
-  persistTokens(accessToken, nextRefreshToken);
+  keepTokens(accessToken, nextRefreshToken);
   return accessToken;
 }
 
@@ -160,58 +146,52 @@ export async function fetchSessionClaims(): Promise<Record<string, unknown> | un
   }
 }
 
+/** Why a sign-in failed, in terms the login form can act on. */
+export type LoginFailure = "invalid" | "not_activated" | "locked" | "mfa_required" | "other";
+
+export type LoginResult = { ok: true } | { ok: false; reason: LoginFailure; message?: string };
+
 /**
- * Direct email + password sign-in through IAM's AuthController
- * (`POST /iam/v4/auth/login`), for the app's own login form.
+ * Email + password sign-in through IAM (`POST /iam/v4/auth/login`).
  *
- * Unlike the hosted IdP flow this returns the tokens in the response body and
- * the SDK deliberately does not store them, so persisting them here is what
- * makes the session exist at all. IAM also sets its session cookie on this
- * same response (the HTTP client sends `credentials: "include"`), which is
- * what carries the session across a reload once the short-lived access token
- * in sessionStorage expires.
+ * Wrong email and wrong password come back as the same "invalid", so the
+ * form can never reveal which one it was or whether the account exists.
+ * Throws only when IAM couldn't be reached, so the caller can tell
+ * "check your details" from "try again later".
  */
 export async function loginWithPassword(params: {
   email: string;
   password: string;
-  rememberMe?: boolean;
-}): Promise<void> {
+  rememberMe: boolean;
+}): Promise<LoginResult> {
   let response: Awaited<ReturnType<typeof blocksClient.auth.login>>;
   try {
     response = await blocksClient.auth.login({
       password: params.password,
-      rememberMe: params.rememberMe ?? true,
+      rememberMe: params.rememberMe,
       username: params.email.trim()
     });
   } catch (caught) {
     // A rejected credential arrives as a 401 carrying an OAuth error envelope,
     // which the SDK attaches to the thrown error as `body`. Anything without
-    // that envelope is a transport failure and is rethrown untouched, so the
-    // caller can still tell "wrong password" from "the API is unreachable".
-    const code = loginErrorCode(caught);
-    if (!code) throw caught;
-    throw new Error(describeLoginError(code, loginErrorDescription(caught)));
+    // that envelope is a transport failure and is rethrown untouched.
+    const body = loginErrorBody(caught);
+    if (!body?.error) throw caught;
+    return classifyLoginError(body.error, body.error_description);
   }
 
   // IAM can also answer 200 with the same envelope, so a thrown error is not
   // the only failure mode.
-  if (response.error) {
-    throw new Error(describeLoginError(response.error, response.error_description));
-  }
+  if (response.error) return classifyLoginError(response.error, response.error_description);
 
   const accessToken = response.access_token ?? response.accessToken;
   if (accessToken) {
-    persistTokens(accessToken, response.refresh_token ?? response.refreshToken);
-    return;
+    keepTokens(accessToken, response.refresh_token ?? response.refreshToken);
+    return { ok: true };
   }
 
-  // No token and no error: the only remaining success shape is a cookie-only
-  // session, which userInfo() will confirm. Treating this as a failure would
-  // reject a login that actually worked.
-  const claims = await fetchSessionClaims();
-  if (!claims) {
-    throw new Error("Sign-in didn't return a session. Check your email and password, then try again.");
-  }
+  // No token and no error: a cookie-only session, which userInfo() confirms.
+  return (await fetchSessionClaims()) ? { ok: true } : { ok: false, reason: "other" };
 }
 
 function loginErrorBody(error: unknown): { error?: string; error_description?: string } | undefined {
@@ -219,135 +199,23 @@ function loginErrorBody(error: unknown): { error?: string; error_description?: s
   return body && typeof body === "object" ? (body as { error?: string; error_description?: string }) : undefined;
 }
 
-function loginErrorCode(error: unknown): string {
-  const code = loginErrorBody(error)?.error;
-  return typeof code === "string" ? code : "";
-}
-
-function loginErrorDescription(error: unknown): string | undefined {
-  return loginErrorBody(error)?.error_description;
-}
-
-/** IAM's OAuth error codes are not written for end users. */
-function describeLoginError(code: string, description?: string): string {
+/** IAM's OAuth error codes, sorted into what the form shows. */
+function classifyLoginError(code: string, description?: string): LoginResult {
   switch (code) {
     case "invalid_grant":
     case "invalid_username_password":
     case "invalid_username_or_password":
-      return "That email and password don't match an account.";
-    case "account_locked":
-      return "This account is locked after too many failed attempts. Try again shortly, or reset your password.";
+      return { ok: false, reason: "invalid" };
     case "account_not_verified":
     case "user_not_active":
-      return "This account hasn't been activated yet. Check your inbox for the activation link.";
+      return { ok: false, reason: "not_activated" };
+    case "account_locked":
+      return { ok: false, reason: "locked", message: description };
     case "mfa_required":
-      return "This account needs a second factor, which this app doesn't collect yet. Use \"Continue with Blocks\" instead.";
+      return { ok: false, reason: "mfa_required" };
     default:
-      return description || "Sign-in failed. Check your email and password, then try again.";
+      return { ok: false, reason: "other", message: description };
   }
-}
-
-/**
- * Sends the password-recovery mail. IAM owns the reset link and the form
- * behind it, so this app only triggers it.
- *
- * Resolves the same way whether or not the address has an account -- telling
- * an anonymous caller which emails are registered is an account-enumeration
- * leak, and IAM's own response is deliberately vague for the same reason.
- */
-export async function recoverPassword(email: string): Promise<void> {
-  await blocksClient.auth.recover({ email: email.trim() });
-}
-
-/**
- * The callback URL this app is actually reachable at right now.
- *
- * IAM matches `redirect_uri` byte-for-byte against the OIDC client's
- * registered list, including scheme and port, so this is also the exact
- * string to register when a new origin needs to support hosted sign-in.
- */
-export function currentCallbackUri(): string {
-  return `${window.location.origin}/login/callback`;
-}
-
-/**
- * Starts the hosted Blocks sign-in journey: the browser leaves for Blocks'
- * own login page and comes back to `/login/callback` with a code.
- *
- * `redirectUri` is sent explicitly rather than left to the SDK default so the
- * journey follows whichever origin the app is served from, instead of being
- * pinned to the one baked into `.env` at build time.
- */
-export async function startLogin(returnTo?: string): Promise<void> {
-  if (!blocksConfig.oidcClientId) {
-    throw new Error("Blocks sign-in is not configured. Set VITE_BLOCKS_OIDC_CLIENT_ID in .env.");
-  }
-
-  // Survives the round trip to Blocks and back, since the app is fully
-  // unloaded while the user is on IAM's pages.
-  sessionStorage.setItem(RETURN_KEY, returnTo || "/");
-
-  try {
-    await blocksClient.auth.idp.redirectToProvider({ redirectUri: currentCallbackUri() });
-  } catch (caught) {
-    sessionStorage.removeItem(RETURN_KEY);
-    throw new Error(describeIdpFailure(caught));
-  }
-}
-
-/**
- * An unregistered `redirect_uri` is the overwhelmingly common failure here,
- * and IAM reports it in a way that does not say which URI to register.
- */
-function describeIdpFailure(error: unknown): string {
-  const raw = error instanceof Error ? error.message : String(error ?? "");
-
-  if (/redirect_uri|redirect uri|invalid_request|unauthorized_client/i.test(raw)) {
-    return `Blocks rejected the return address for this origin. Register ${currentCallbackUri()} as a redirect URI on OIDC client ${blocksConfig.oidcClientId}, then try again.`;
-  }
-
-  return raw || "Couldn't start Blocks sign-in. Try again.";
-}
-
-export async function completeLogin(callbackUrl: string): Promise<CallbackResult> {
-  const returnTo = sessionStorage.getItem(RETURN_KEY) || "/";
-
-  sessionStorage.removeItem(RETURN_KEY);
-
-  let data: Awaited<ReturnType<typeof blocksClient.auth.idp.callback>>;
-  try {
-    data = await blocksClient.auth.idp.callback(callbackUrl);
-  } catch (caught) {
-    // Without this the callback page waits on a promise that never settles
-    // and shows its spinner forever.
-    return { message: describeIdpFailure(caught), ok: false };
-  }
-
-  if (data.error) {
-    return { message: data.error_description || data.error, ok: false };
-  }
-
-  // A non-default OIDC config returns the tokens in the body; cache them and
-  // the session is established.
-  const accessToken = data.access_token ?? data.accessToken;
-  if (accessToken) {
-    persistTokens(accessToken, data.refresh_token ?? data.refreshToken);
-    return { ok: true, returnTo };
-  }
-
-  // Otherwise IAM set the session as a cookie on this same response. That is
-  // the normal, successful path -- but only if the browser actually kept the
-  // cookie, which it will not when the app is served from an origin the
-  // cookie's domain does not cover. Confirming with userInfo() here turns
-  // that into one clear message, instead of reporting success and then
-  // bouncing silently back to /login when the guard finds no session.
-  const claims = await fetchSessionClaims();
-  if (claims) return { ok: true, returnTo };
-
-  return {
-    message: `Blocks signed you in, but the session didn't stick on ${window.location.origin}. The session cookie is scoped to ${blocksConfig.appDomain}, so this journey needs the app served from that domain. Email sign-in works here.`,
-    ok: false
-  };
 }
 
 export async function logout(): Promise<void> {

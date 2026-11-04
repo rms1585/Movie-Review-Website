@@ -108,11 +108,12 @@
   --hero-dot-h: 4px;
   --hero-quiet-icon: 14px;
   --form-w: 520px;
-  --signup-icon: 40px;
+  --account-icon: 40px;
+  --checkbox-size: 18px;
   --dialog-media-w: 960px;
-  --signup-art-width: 60%;
-  --signup-art-height: calc(100dvh - var(--header-height));
-  --signup-fade-edge: 15%;
+  --account-art-width: 60%;
+  --account-art-height: calc(100dvh - var(--header-height));
+  --account-fade-edge: 15%;
   --icon-size: 18px;
   /* Tall enough to feel full-screen, short enough that Trending peeks
      above the fold and says "there's more below". */
@@ -1695,6 +1696,61 @@ li.chip.skeleton {
   line-height: var(--leading-ui);
 }
 
+.field__hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+}
+
+/* Room on the right for the show/hide button, which sits inside the input. */
+.field__password {
+  position: relative;
+}
+
+.field__password .field__input {
+  padding-right: var(--target-min);
+}
+
+.field__reveal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--motion-instant) var(--ease-standard);
+}
+
+.field__reveal:hover {
+  color: var(--color-text);
+}
+
+/* A native checkbox, sized up and tinted lime, with its whole label clickable. */
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+  cursor: pointer;
+}
+
+.checkbox__input {
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
 /* A button that reads as an inline link, for secondary choices inside text. */
 .text-button {
   display: inline;
@@ -1713,14 +1769,14 @@ li.chip.skeleton {
   text-decoration-thickness: 2px;
 }
 
-/* ---------- Sign-up page ---------- */
-.signup-page {
+/* ---------- Account pages (sign up, log in, password, activation) ---------- */
+.account-page {
   position: relative;
   /* Clips the art's right edge and stops it adding sideways scroll. */
   overflow: clip;
 }
 
-.signup-page__body {
+.account-page__body {
   position: relative;
   z-index: 1;
   padding-block: var(--section-gap);
@@ -1729,102 +1785,135 @@ li.chip.skeleton {
 /* The still sits under the right side and dissolves into the page towards
    the form; overlays in the page colour stand in for a mask. Wide screens
    only: on narrower ones it would sit under the form's text. */
-.signup-page__art {
+.account-page__art {
   display: none;
 }
 
 @media (min-width: 1024px) {
-  .signup-page {
-    min-height: var(--signup-art-height);
+  .account-page {
+    min-height: var(--account-art-height);
   }
 
-  .signup-page__art {
+  .account-page__art {
     position: absolute;
     inset: 0 0 0 auto;
     display: block;
-    width: var(--signup-art-width);
+    width: var(--account-art-width);
   }
 
-  .signup-page__image {
+  .account-page__image {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .signup-page__art::after {
+  .account-page__art::after {
     content: "";
     position: absolute;
     inset: 0;
     background:
-      var(--color-fade-to-bg) bottom / 100% var(--signup-fade-edge) no-repeat,
-      var(--color-fade-from-top) top / 100% var(--signup-fade-edge) no-repeat,
+      var(--color-fade-to-bg) bottom / 100% var(--account-fade-edge) no-repeat,
+      var(--color-fade-from-top) top / 100% var(--account-fade-edge) no-repeat,
       var(--color-fade-from-left);
   }
 }
 
-.signup {
+.account {
   display: grid;
   max-width: var(--form-w);
 }
 
-.signup__form {
+.account__fieldset {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Keep me signed in on the left, Forgot password on the right. */
+.account__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.account__link {
+  color: var(--color-text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.account__link:hover {
+  color: var(--color-accent);
+}
+
+.account__alt {
+  color: var(--color-text-muted);
+}
+
+.account__form {
   display: grid;
   gap: var(--space-5);
 }
 
-.signup__names {
+.account__names {
   display: grid;
   gap: var(--space-5);
 }
 
 @media (min-width: 640px) {
-  .signup__names {
+  .account__names {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-4);
   }
 }
 
-.signup__submit {
+.account__submit {
   justify-self: start;
 }
 
-.signup__form-error {
+.account__form-error {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
   background: var(--color-error-surface);
   color: var(--color-error);
 }
 
-.signup__hint {
+.account__hint {
   color: var(--color-text-muted);
   font-size: var(--text-ui);
   line-height: var(--leading-ui);
 }
 
-.signup__switch {
+.account__switch {
   margin-top: var(--space-8);
   padding-top: var(--space-6);
   border-top: 1px solid var(--color-border);
   color: var(--color-text-muted);
 }
 
-.signup__sent {
+.account__sent {
   display: grid;
   justify-items: start;
   gap: var(--space-3);
 }
 
-.signup__sent-icon {
-  width: var(--signup-icon);
-  height: var(--signup-icon);
+.account__sent-icon {
+  width: var(--account-icon);
+  height: var(--account-icon);
   color: var(--color-text-muted);
 }
 
-.signup__sent-text {
+.account__sent-text {
   max-width: var(--measure);
 }
 
-.signup__sent-actions {
+.account__sent-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -2326,6 +2415,33 @@ button.user-menu__trigger:active {
 }
 
 /* ---------- Reduced motion (animation.md §5) ---------- */
+/* ---------- Toast ---------- */
+.toast-region {
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  z-index: 30;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-weight: 600;
+  animation: toast-enter var(--motion-slow) var(--ease-enter);
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
