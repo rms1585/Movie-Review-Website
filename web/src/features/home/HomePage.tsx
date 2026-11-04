@@ -4,6 +4,7 @@ import { Rail } from "../movies/components/Rail";
 import { useHighlyRated, useNewReleases, useTrending } from "../movies/queries";
 import type { MovieSummary } from "../movies/types";
 import { FeaturedHero, FeaturedHeroSkeleton } from "./FeaturedHero";
+import { FeaturedMorph, supportsWebGl } from "./FeaturedMorph";
 
 const FEATURED_COUNT = 6;
 
@@ -26,6 +27,7 @@ export function HomePage() {
   const highlyRated = useHighlyRated();
 
   const featured = useMemo(() => pickFeatured(trending.data), [trending.data]);
+  const canMorph = useMemo(supportsWebGl, []);
   // The Trending rail keeps every film, carousel ones included: leaving six
   // out would thin the rail more than the repeat costs.
   const claimedForNew = useMemo(() => claimedBefore(trending.data), [trending.data]);
@@ -34,7 +36,11 @@ export function HomePage() {
   return (
     <div className="home">
       <h1 className="sr-only">Limereel</h1>
-      {featured.length > 0 ? <FeaturedHero movies={featured} /> : trending.isPending && <FeaturedHeroSkeleton />}
+      {featured.length > 0 ? (
+        canMorph ? <FeaturedMorph movies={featured} /> : <FeaturedHero movies={featured} />
+      ) : (
+        trending.isPending && <FeaturedHeroSkeleton />
+      )}
 
       <div className="container home__rails">
         <Rail

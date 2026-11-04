@@ -1252,6 +1252,50 @@ a {
   }
 }
 
+/* The WebGL banner (MorphSlider): the morphing stills fill the hero, the
+   usual darkening and fade sit over them, and the film's text sits on top.
+   Text lets drags through to the slider; only the button takes clicks. */
+.hero-morph__slider.morph-slider {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+
+.hero-morph__scrim {
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-morph__content {
+  position: absolute;
+  inset-inline: var(--hero-inset);
+  bottom: var(--hero-bar-bottom);
+  z-index: 2;
+  display: grid;
+  gap: var(--space-3);
+  max-width: 720px;
+  pointer-events: none;
+  animation: hero-morph-enter var(--motion-slow) var(--ease-enter);
+}
+
+.hero-morph__action {
+  pointer-events: auto;
+}
+
+/* Dots move to the bottom-right corner, clear of the film's text. */
+.hero-morph .morph-slider-indicators {
+  left: auto;
+  right: var(--hero-inset);
+  bottom: calc(var(--hero-bar-bottom) + var(--space-3));
+}
+
+@keyframes hero-morph-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+  }
+}
+
 /* ---------- Chips (design.md §7.6) ---------- */
 .genre-section {
   display: grid;
