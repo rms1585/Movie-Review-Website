@@ -39,12 +39,13 @@
   --display-width: 80;
   --wordmark-width: 78;
 
-  --text-display: 32px;
-  --leading-display: 36px;
-  --text-h1: 26px;
-  --leading-h1: 32px;
-  --text-h2: 20px;
-  --leading-h2: 26px;
+  --text-display: 40px;
+  --leading-display: 42px;
+  --text-h1: 30px;
+  --leading-h1: 34px;
+  --text-h2: 24px;
+  --leading-h2: 28px;
+  --tracking-display: -0.01em;
   --text-h3: 18px;
   --leading-h3: 24px;
   --text-verdict: 17px;
@@ -66,7 +67,7 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
-  --section-gap: var(--space-8);
+  --section-gap: var(--space-12);
 
   --content-max: 1120px;
   --gutter: 16px;
@@ -92,6 +93,9 @@
   --radius-sheet: 20px 20px 0 0;
   --radius-pill: 999px;
   --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 16px 28px rgba(0, 0, 0, 0.55);
+  --poster-lift: -6px;
+  --poster-lift-scale: 1.04;
   --blur-header: 12px;
 
   --logo-symbol: 28px;
@@ -113,16 +117,16 @@
 
 @media (min-width: 768px) {
   :root {
-    --text-display: 48px;
-    --leading-display: 52px;
-    --text-h1: 36px;
-    --leading-h1: 42px;
-    --text-h2: 24px;
-    --leading-h2: 30px;
+    --text-display: 72px;
+    --leading-display: 70px;
+    --text-h1: 48px;
+    --leading-h1: 50px;
+    --text-h2: 32px;
+    --leading-h2: 36px;
     --text-verdict: 20px;
     --leading-verdict: 28px;
     --gutter: 32px;
-    --section-gap: var(--space-10);
+    --section-gap: var(--space-16);
   }
 }
 
@@ -160,6 +164,7 @@ h2 {
   font-variation-settings: "wdth" var(--display-width);
   overflow-wrap: break-word;
   text-wrap: balance;
+  letter-spacing: var(--tracking-display);
   min-width: 0;
   margin: 0;
   color: var(--color-text);
@@ -783,14 +788,32 @@ a {
 }
 
 .poster-card__art {
+  position: relative;
   border-radius: var(--radius-sm);
-  transition: transform var(--motion-fast) var(--ease-standard), filter var(--motion-fast) var(--ease-standard);
+  transition: transform var(--motion-base) var(--ease-standard), filter var(--motion-base) var(--ease-standard);
+}
+
+/* The lift shadow fades in on its own layer so only opacity animates,
+   never box-shadow itself. */
+.poster-card__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: var(--shadow-lift);
+  opacity: 0;
+  transition: opacity var(--motion-base) var(--ease-standard);
 }
 
 @media (hover: hover) {
   .poster-card:hover .poster-card__art {
-    transform: translateY(calc(var(--space-1) * -1)) scale(1.03);
+    transform: translateY(var(--poster-lift)) scale(var(--poster-lift-scale));
     filter: brightness(1.08);
+  }
+
+  .poster-card:hover .poster-card__art::after {
+    opacity: 1;
   }
 }
 
@@ -843,7 +866,7 @@ a {
   grid-auto-columns: calc((100% - var(--space-4) * 2) / 3.2);
   gap: var(--space-4);
   margin: 0;
-  padding: var(--space-2) 0 var(--space-3);
+  padding: var(--space-3) 0 var(--space-3);
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -996,7 +1019,7 @@ a {
   position: relative;
   display: grid;
   gap: var(--space-3);
-  max-width: 560px;
+  max-width: 720px;
   padding: var(--space-4);
 }
 
@@ -1030,7 +1053,7 @@ a {
 @media (min-width: 768px) {
   .hero {
     aspect-ratio: auto;
-    height: 420px;
+    height: 480px;
   }
 
   .hero__content {

@@ -100,9 +100,9 @@ The scale steps by about 1.25× or more between heading levels, so the hierarchy
 
 | Token | Size / line-height | Font | Use |
 |---|---|---|---|
-| `--text-display` | 48 / 52 (desktop) · 32 / 36 (mobile) | Archivo 800 | Hero film title |
-| `--text-h1` | 36 / 42 (desktop) · 26 / 32 (mobile) | Archivo 800 | Film title on detail, page titles |
-| `--text-h2` | 24 / 30 (desktop) · 20 / 26 (mobile) | Archivo 700 | Section titles ("Top verdicts", rails) |
+| `--text-display` | 72 / 70 (desktop) · 40 / 42 (mobile) | Archivo 800 | Hero film title |
+| `--text-h1` | 48 / 50 (desktop) · 30 / 34 (mobile) | Archivo 800 | Film title on detail, page titles |
+| `--text-h2` | 32 / 36 (desktop) · 24 / 28 (mobile) | Archivo 700 | Section titles ("Top verdicts", rails) |
 | `--text-h3` | 18 / 24 | Atkinson Hyperlegible Next 600 | Card titles, dialog titles |
 | `--text-verdict` | 20 / 28 (desktop) · 17 / 24 (mobile) | Atkinson Hyperlegible Next 600, italic off | One-line verdict pull-quotes |
 | `--text-body` | 16 / 26 | Atkinson Hyperlegible Next 400 | Review text, plot |
@@ -112,6 +112,7 @@ The scale steps by about 1.25× or more between heading levels, so the hierarchy
 Rules:
 - Body text never goes below 16px, and review text is never smaller than plot text.
 - Line length for reviews and plot: **max 70ch**.
+- Archivo headings (display, h1, h2) are set tight, at -0.01em letter spacing, so large titles hold together.
 - Film titles may truncate to 2 lines on cards (with an ellipsis); the full title goes in the `title` attribute.
 - No all-caps body. All-caps is allowed only for `--text-caption` labels, with 0.04em letter spacing.
 
@@ -123,8 +124,10 @@ Rules:
 
 `--space-1` 4 · `--space-2` 8 · `--space-3` 12 · `--space-4` 16 · `--space-5` 20 · `--space-6` 24 · `--space-8` 32 · `--space-10` 40 · `--space-12` 48 · `--space-16` 64
 
+**Poster hover (pointer devices only):** the poster lifts 6px and scales to 1.04, and a soft shadow fades in under it (`--shadow-lift`). Reduced motion keeps it still.
+
 - Inside cards, panels and buttons: at least `--space-3`. Text never touches a container edge.
-- Between page sections: `--space-10` (desktop), `--space-8` (mobile).
+- Between page sections: `--space-16` (desktop), `--space-12` (mobile). Generous gaps let each rail read as its own scene.
 
 ### 4.2 Layout
 
