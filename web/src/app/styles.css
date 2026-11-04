@@ -2217,14 +2217,39 @@ button.user-menu__trigger:active {
   color: var(--color-text);
 }
 
-/* Video: wide, and centred on phones too, since a bottom sheet would crop a 16:9 frame. */
+/* Video: only the player on the dimmed page, wide, and centred on phones
+   too, since a bottom sheet would crop a 16:9 frame. The close button
+   floats above the player's corner, where it never covers the video. */
 .dialog--media {
   width: min(var(--dialog-media-w), calc(100% - var(--gutter) * 2));
+  overflow: visible;
+  background: none;
+  box-shadow: none;
 }
 
 .dialog--media .dialog__panel {
-  gap: var(--space-3);
-  padding: var(--space-4);
+  position: relative;
+  padding: 0;
+}
+
+.dialog--media .dialog__head {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--space-2));
+}
+
+.dialog--media .dialog__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.dialog--media .dialog__close {
+  margin: 0;
+  color: var(--color-text);
 }
 
 .trailer {
@@ -2232,6 +2257,7 @@ button.user-menu__trigger:active {
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--color-bg);
+  box-shadow: var(--shadow-float);
 }
 
 .trailer__player {
@@ -2239,12 +2265,6 @@ button.user-menu__trigger:active {
   width: 100%;
   height: 100%;
   border: 0;
-}
-
-.trailer__fallback {
-  color: var(--color-text-muted);
-  font-size: var(--text-ui);
-  line-height: var(--leading-ui);
 }
 
 .dialog__text {

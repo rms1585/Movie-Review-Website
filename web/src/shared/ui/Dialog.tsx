@@ -8,7 +8,10 @@ type DialogProps = {
   onClose: () => void;
   title: string;
   children: ReactNode;
-  /** "media" is wide and stays centred on phones, for video rather than choices. */
+  /**
+   * "media" is just the content (video) on the dimmed page: no panel, the
+   * title kept for screen readers only, and the close button floating above.
+   */
   variant?: "default" | "media";
 };
 

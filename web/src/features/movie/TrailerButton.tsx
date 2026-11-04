@@ -31,13 +31,6 @@ export function TrailerButton({ trailerKey, filmTitle }: { trailerKey: string; f
             />
           </div>
         )}
-        {/* Some studios block playback outside YouTube; this is the way out. */}
-        <p className="trailer__fallback">
-          Not playing?{" "}
-          <a className="text-button" href={`https://www.youtube.com/watch?v=${trailerKey}`} rel="noopener noreferrer" target="_blank">
-            Watch on YouTube<span className="sr-only"> (opens in a new tab)</span>
-          </a>
-        </p>
       </Dialog>
     </>
   );
