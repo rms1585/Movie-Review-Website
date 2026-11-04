@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { fetchSessionClaims, logout as endSession, loginWithPassword, onSessionExpired } from "../../lib/blocks/auth";
@@ -20,9 +21,21 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 // e.g. after signing out in another tab or the session expiring meanwhile.
 const STATUS_POLL_MS = 5 * 60_000;
 
+// Cached data that belongs to whoever is signed in: the IAM profile and
+// "my ratings". Film data and public ratings are the same for everyone.
+const PERSONAL_QUERY_KEYS = [["iam"], ["ratings", "mine"]];
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [claims, setClaims] = useState<Record<string, unknown> | undefined>();
+  const queryClient = useQueryClient();
+
+  // Without this, logging out and in as someone else in the same tab would
+  // keep showing the previous person's name, avatar and ratings until the
+  // cache went stale.
+  const forgetPersonalData = useCallback(() => {
+    for (const queryKey of PERSONAL_QUERY_KEYS) queryClient.removeQueries({ queryKey });
+  }, [queryClient]);
 
   // The session's source of truth is IAM's GET /iam/v4/auth/me
   // (blocksClient.auth.userInfo()), not a token this app can inspect --
@@ -59,14 +72,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // navigate straight afterwards without racing the guard.
   const signIn = useCallback(async (params: { email: string; password: string; rememberMe: boolean }) => {
     const result = await loginWithPassword(params);
-    if (result.ok) await refresh();
+    if (result.ok) {
+      forgetPersonalData();
+      await refresh();
+    }
     return result;
-  }, [refresh]);
+  }, [forgetPersonalData, refresh]);
 
   const logout = useCallback(async () => {
     await endSession();
+    forgetPersonalData();
     await refresh();
-  }, [refresh]);
+  }, [forgetPersonalData, refresh]);
 
   const value = useMemo<AuthContextValue>(() => ({
     claims,
