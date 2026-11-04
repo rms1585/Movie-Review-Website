@@ -109,6 +109,7 @@
   --hero-quiet-icon: 14px;
   --form-w: 520px;
   --signup-icon: 40px;
+  --dialog-media-w: 960px;
   --signup-art-width: 60%;
   --signup-art-height: calc(100dvh - var(--header-height));
   --signup-fade-edge: 15%;
@@ -2216,6 +2217,36 @@ button.user-menu__trigger:active {
   color: var(--color-text);
 }
 
+/* Video: wide, and centred on phones too, since a bottom sheet would crop a 16:9 frame. */
+.dialog--media {
+  width: min(var(--dialog-media-w), calc(100% - var(--gutter) * 2));
+}
+
+.dialog--media .dialog__panel {
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.trailer {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+
+.trailer__player {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.trailer__fallback {
+  color: var(--color-text-muted);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+}
+
 .dialog__text {
   color: var(--color-text-muted);
 }
@@ -2250,6 +2281,20 @@ button.user-menu__trigger:active {
 
   .dialog__actions {
     display: grid;
+  }
+
+  .dialog--media {
+    width: calc(100% - var(--gutter) * 2);
+    margin: auto;
+    border-radius: var(--radius-lg);
+  }
+
+  .dialog--media[open] {
+    animation: dialog-enter var(--motion-slow) var(--ease-enter);
+  }
+
+  .dialog--media .dialog__handle {
+    display: none;
   }
 }
 

@@ -1,12 +1,15 @@
 import { X } from "lucide-react";
 import { useEffect, useId, useRef } from "react";
 import type { ReactNode } from "react";
+import { cn } from "../../lib/utils";
 
 type DialogProps = {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
+  /** "media" is wide and stays centred on phones, for video rather than choices. */
+  variant?: "default" | "media";
 };
 
 /**
@@ -15,7 +18,7 @@ type DialogProps = {
  * inert and keeps focus inside; Esc closes it; the browser returns focus to
  * the control that opened it.
  */
-export function Dialog({ open, onClose, title, children }: DialogProps) {
+export function Dialog({ open, onClose, title, children, variant = "default" }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -29,7 +32,7 @@ export function Dialog({ open, onClose, title, children }: DialogProps) {
   return (
     <dialog
       aria-labelledby={titleId}
-      className="dialog"
+      className={cn("dialog", variant === "media" && "dialog--media")}
       onClick={(event) => {
         // A click on the backdrop lands on the <dialog> itself, outside its panel.
         if (event.target === event.currentTarget) onClose();

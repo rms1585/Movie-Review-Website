@@ -1,5 +1,4 @@
 import { BlocksApiError } from "@seliseblocks/client";
-import { Play } from "lucide-react";
 import { m } from "motion/react";
 import { useEffect } from "react";
 import { AppLink } from "../../app/router/navigation";
@@ -18,6 +17,7 @@ import { backdropSource } from "../movies/images";
 import { useCachedSummary, useMovie } from "../movies/queries";
 import type { MovieDetail } from "../movies/types";
 import { CastList } from "./CastList";
+import { TrailerButton } from "./TrailerButton";
 
 const DETAIL_POSTER_SIZES = "(min-width: 768px) 300px, 40vw";
 
@@ -90,18 +90,7 @@ function MovieDetailView({ movie }: { movie: MovieDetail }) {
           )}
           <div className="movie__actions">
             <RateAction filmTitle={movie.title} hasRated={Boolean(ratings.myRating)} tmdbMovieId={movie.id} />
-            {movie.trailerKey && (
-              <a
-                className="button button--secondary"
-                href={`https://www.youtube.com/watch?v=${movie.trailerKey}`}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <Play aria-hidden="true" className="icon" />
-                Watch trailer
-                <span className="sr-only">(opens YouTube in a new tab)</span>
-              </a>
-            )}
+            {movie.trailerKey && <TrailerButton filmTitle={movie.title} trailerKey={movie.trailerKey} />}
           </div>
         </m.div>
       </div>
