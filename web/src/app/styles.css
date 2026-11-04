@@ -105,6 +105,8 @@
   --hero-dot-track: 20px;
   --hero-dot-h: 4px;
   --hero-quiet-icon: 14px;
+  --form-w: 520px;
+  --signup-icon: 40px;
   --icon-size: 18px;
   /* Tall enough to feel full-screen, short enough that Trending peeks
      above the fold and says "there's more below". */
@@ -1615,14 +1617,164 @@ li.chip.skeleton {
   font-size: var(--text-caption);
 }
 
-.account-button__signup {
-  display: none;
+.account-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-@media (min-width: 768px) {
-  .account-button__signup {
-    display: inline;
+/* Signed out, two buttons plus Browse don't fit beside the full logo on a
+   phone, so the symbol stands in for the wordmark (the link keeps its
+   "Limereel home" name). Signed in, the avatar is small and the word stays. */
+@media (max-width: 419px) {
+  .site-header:has(.account-buttons) .logo__word {
+    display: none;
   }
+}
+
+/* ---------- Text fields ---------- */
+.field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.field__label {
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+  font-weight: 600;
+}
+
+.field__optional {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.field__input {
+  width: 100%;
+  min-height: var(--target-min);
+  padding: 0 var(--space-4);
+  box-sizing: border-box;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  transition: border-color var(--motion-instant) var(--ease-standard);
+}
+
+.field__input:hover {
+  border-color: var(--color-text-muted);
+}
+
+.field__input:focus-visible {
+  outline: var(--focus-ring) solid var(--color-accent);
+  outline-offset: 0;
+  border-color: var(--color-accent);
+}
+
+.field__input[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.field__input:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.field__error {
+  color: var(--color-error);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+}
+
+/* A button that reads as an inline link, for secondary choices inside text. */
+.text-button {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.text-button:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- Sign-up page ---------- */
+.signup {
+  display: grid;
+  max-width: var(--form-w);
+}
+
+.signup__form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.signup__names {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 640px) {
+  .signup__names {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+.signup__submit {
+  justify-self: start;
+}
+
+.signup__form-error {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-error-surface);
+  color: var(--color-error);
+}
+
+.signup__hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+}
+
+.signup__switch {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.signup__sent {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+}
+
+.signup__sent-icon {
+  width: var(--signup-icon);
+  height: var(--signup-icon);
+  color: var(--color-text-muted);
+}
+
+.signup__sent-text {
+  max-width: var(--measure);
+}
+
+.signup__sent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-6);
+  margin-top: var(--space-4);
 }
 
 /* ---------- Avatar (design.md §4.4: 1:1 circle) ---------- */

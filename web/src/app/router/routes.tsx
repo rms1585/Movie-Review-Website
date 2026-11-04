@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { CallbackPage } from "../../features/auth/CallbackPage";
+import { SignUpPage } from "../../features/auth/SignUpPage";
 import { BrowsePage } from "../../features/browse/BrowsePage";
 import { HomePage } from "../../features/home/HomePage";
 import { MoviePage } from "../../features/movie/MoviePage";
@@ -27,6 +28,7 @@ type Route = {
 const routes: Route[] = [
   { pattern: /^\/$/, render: () => <HomePage /> },
   { pattern: /^\/search$/, render: (_, search) => <SearchPage query={search.get("q") ?? ""} /> },
+  { pattern: /^\/signup$/, render: () => <SignUpPage /> },
   { pattern: /^\/browse$/, render: (_, search) => <BrowsePage search={search} /> },
   { pattern: /^\/movie\/(\d+)\/reviews$/, render: () => <ReviewsPage /> },
   { pattern: /^\/movie\/(\d+)\/review$/, requiresAuth: true, render: ([id]) => <RatePage key={id} tmdbMovieId={Number(id)} /> },

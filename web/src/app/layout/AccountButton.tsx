@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { isLoginConfigured } from "../../lib/blocks/config";
 import { useAuth } from "../providers/AuthProvider";
-import { useNavigation } from "../router/navigation";
+import { AppLink, useNavigation } from "../router/navigation";
 import { UserMenu } from "./UserMenu";
 
 export function AccountButton() {
@@ -26,7 +26,11 @@ export function AccountButton() {
   }
 
   return (
-    <>
+    <div className="account-buttons">
+      {/* Hidden on the sign-up page itself, where it would only link back to where you are. */}
+      {path !== "/signup" && (
+        <AppLink className="button button--secondary button--sm" to="/signup">Sign up</AppLink>
+      )}
       <button
         aria-describedby={loginReady ? undefined : hintId}
         aria-disabled={!loginReady || isBusy}
@@ -34,12 +38,9 @@ export function AccountButton() {
         onClick={loginReady && !isBusy ? handleLogin : undefined}
         type="button"
       >
-        {/* One entry point: Blocks' hosted page signs people in and offers
-            "Create an account", and the SDK can't open its sign-up screen
-            directly. Phones keep the short label to fit beside the logo. */}
-        <span>Log in<span className="account-button__signup"> or sign up</span></span>
+        Log in
       </button>
       {!loginReady && <span className="sr-only" id={hintId}>Sign-in is not set up yet.</span>}
-    </>
+    </div>
   );
 }
