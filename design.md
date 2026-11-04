@@ -13,7 +13,7 @@
 ## 1. Design principles
 
 1. **Content first.** Posters and backdrops are the colour on the page. The interface stays dark and quiet so the artwork leads.
-2. **One accent, one job.** Signal lime is used only for **primary actions**, **our community score** and **hover feedback** on things you can open or pick (a poster's glow and title, a chip's outline). Never for decoration at rest, never for body text.
+2. **One accent, one job.** Signal lime is used only for **primary actions**, **our community score** and **hover feedback** on things you can open or pick (a poster's title, a chip's outline). Never for decoration at rest, never for body text.
 3. **Glanceable decisions.** A visitor should know "is it good?" within 2 seconds of landing on a film: score, verdicts, then detail.
 4. **Spoiler-safe is the brand.** The frosted spoiler block is the signature visual. It must look deliberate and premium, not like a broken image.
 5. **Fast beats fancy.** If an effect costs load time or smoothness on a mid-range phone, cut it.
@@ -124,7 +124,7 @@ Rules:
 
 `--space-1` 4 · `--space-2` 8 · `--space-3` 12 · `--space-4` 16 · `--space-5` 20 · `--space-6` 24 · `--space-8` 32 · `--space-10` 40 · `--space-12` 48 · `--space-16` 64
 
-**Poster hover (pointer devices only):** the poster lifts 6px and scales to 1.04, and a soft shadow fades in under it (`--shadow-lift`). Reduced motion keeps it still.
+**Poster hover (pointer devices only):** the poster lifts 6px and scales to 1.04, with no shadow, and its title turns lime. Reduced motion keeps it still.
 
 - Inside cards, panels and buttons: at least `--space-3`. Text never touches a container edge.
 - Between page sections: `--space-16` (desktop), `--space-12` (mobile). Generous gaps let each rail read as its own scene.
@@ -213,7 +213,7 @@ See §2.3.
 ### 7.3 Poster card
 - Poster (2:3, `--radius-sm`) → title (`--text-ui` 600, max 2 lines) → year · our score badge · TMDB badge.
 - The whole card is one link (one tab stop).
-- Hover (desktop): lift and brighten the poster, a soft lime glow fades in around it (`--shadow-lift`), and the title turns lime; see `animation.md`. Focus: ring around the poster.
+- Hover (desktop): lift and brighten the poster (no shadow or glow), and the title turns lime; see `animation.md`. Focus: ring around the poster.
 - Skeleton: poster box + 2 text bars in `--color-surface`.
 
 ### 7.4 Rails

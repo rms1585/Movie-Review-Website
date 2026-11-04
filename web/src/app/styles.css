@@ -97,9 +97,6 @@
   --radius-sheet: 20px 20px 0 0;
   --radius-pill: 999px;
   --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.45);
-  /* Hover lift: a dark drop for depth plus a soft lime glow, so the
-     pointed-at film reads as live (design.md §1, hover feedback). */
-  --shadow-lift: 0 0 24px rgba(198, 244, 50, 0.35), 0 16px 28px rgba(0, 0, 0, 0.55);
   --color-accent-tint: rgba(198, 244, 50, 0.12);
   --poster-lift: -6px;
   --poster-lift-scale: 1.04;
@@ -828,32 +825,14 @@ a {
 }
 
 .poster-card__art {
-  position: relative;
   border-radius: var(--radius-sm);
   transition: transform var(--motion-base) var(--ease-standard), filter var(--motion-base) var(--ease-standard);
-}
-
-/* The lift shadow fades in on its own layer so only opacity animates,
-   never box-shadow itself. */
-.poster-card__art::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  box-shadow: var(--shadow-lift);
-  opacity: 0;
-  transition: opacity var(--motion-base) var(--ease-standard);
 }
 
 @media (hover: hover) {
   .poster-card:hover .poster-card__art {
     transform: translateY(var(--poster-lift)) scale(var(--poster-lift-scale));
     filter: brightness(1.08);
-  }
-
-  .poster-card:hover .poster-card__art::after {
-    opacity: 1;
   }
 }
 
@@ -913,11 +892,7 @@ a {
   grid-auto-columns: calc((100% - var(--space-4) * 2) / 3.2);
   gap: var(--space-4);
   margin: 0;
-  /* A scroll row clips everything outside it, including the hover glow;
-     the extra padding gives the glow room and the negative margin hands
-     the space back, so the rail sits where it did. */
-  margin-block: calc(var(--space-3) * -1);
-  padding: var(--space-6) 0;
+  padding: var(--space-3) 0 var(--space-3);
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
