@@ -8,6 +8,13 @@ export function formatReleaseDate(isoDate: string): string {
   return new Date(`${isoDate}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 }
 
+/** "3 Nov 2026" from a full ISO timestamp, in the reader's own timezone. Empty when unknown. */
+export function formatShortDate(isoTimestamp: string): string {
+  const date = new Date(isoTimestamp);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
 /** "2h 14m", or "48m" for anything under an hour. */
 export function formatRuntime(minutes: number): string {
   const hours = Math.floor(minutes / 60);

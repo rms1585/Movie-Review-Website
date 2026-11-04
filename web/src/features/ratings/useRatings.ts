@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "../profile/useCurrentUser";
-import { fetchFilmRatings, saveRating } from "./ratingsApi";
+import { fetchFilmRatings, fetchMyRatings, saveRating } from "./ratingsApi";
 import type { Rating } from "./ratingsApi";
 
 /** Below this many ratings the community score is hidden (SPEC §6). */
 export const MIN_RATINGS_FOR_SCORE = 3;
 
 export const ratingKeys = {
-  film: (tmdbMovieId: number) => ["ratings", tmdbMovieId] as const
+  film: (tmdbMovieId: number) => ["ratings", tmdbMovieId] as const,
+  mine: (authorId: string) => ["ratings", "mine", authorId] as const
 };
 
 export type CommunityScore = { average: number; count: number } | { average: null; count: number };
@@ -36,6 +37,18 @@ export function useFilmRatings(tmdbMovieId: number) {
   };
 }
 
+/** The signed-in user's rating history, newest first. Waits for the user, since the filter is their id. */
+export function useMyRatings() {
+  const me = useCurrentUser();
+  const authorId = me.data?.itemId ?? "";
+  return useQuery({
+    queryKey: ratingKeys.mine(authorId),
+    queryFn: () => fetchMyRatings(authorId),
+    enabled: authorId !== "",
+    staleTime: 60_000
+  });
+}
+
 export function useSaveRating(tmdbMovieId: number) {
   const queryClient = useQueryClient();
   const me = useCurrentUser();
@@ -47,6 +60,12 @@ export function useSaveRating(tmdbMovieId: number) {
       await saveRating({ tmdbMovieId, score, authorId });
       return score;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ratingKeys.film(tmdbMovieId) })
+    onSuccess: () => {
+      const authorId = me.data?.itemId;
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: ratingKeys.film(tmdbMovieId) }),
+        authorId ? queryClient.invalidateQueries({ queryKey: ratingKeys.mine(authorId) }) : undefined
+      ]);
+    }
   });
 }

@@ -4,7 +4,7 @@ import { blocksClient } from "../../lib/blocks/client";
 // Reads are Public so logged-out visitors see community scores; writes and
 // edits need a session and only touch the caller's own records. The author
 // is the platform's CreatedBy field, never a value the browser sends.
-const ratings = blocksClient.data.collection<RatingRecord>("Rating", { fields: ["tmdbMovieId", "score", "CreatedBy"] });
+const ratings = blocksClient.data.collection<RatingRecord>("Rating", { fields: ["tmdbMovieId", "score", "CreatedBy", "LastUpdatedDate"] });
 
 /**
  * Every rating for a film is read in one page and averaged in the browser.
@@ -13,20 +13,44 @@ const ratings = blocksClient.data.collection<RatingRecord>("Rating", { fields: [
  */
 const FILM_RATINGS_PAGE_SIZE = 1000;
 
+/** One person's whole history in one read; sorted in the browser for the same reason. */
+const MY_RATINGS_PAGE_SIZE = 1000;
+
 type RatingRecord = Record<string, unknown> & {
   ItemId?: string;
   tmdbMovieId?: number;
   score?: number;
   CreatedBy?: string;
+  LastUpdatedDate?: string;
 };
 
 export type Rating = { id: string; score: number; authorId: string };
+
+/** A rating as the profile lists it: which film, and when the score was last set. */
+export type MyRating = Rating & { tmdbMovieId: number; ratedAt: string };
 
 type ListResponse = { data?: { getRatings?: { items?: RatingRecord[] } } };
 
 function toRating(record: RatingRecord): Rating | undefined {
   if (!record.ItemId || typeof record.score !== "number") return undefined;
   return { id: record.ItemId, score: record.score, authorId: record.CreatedBy ?? "" };
+}
+
+export async function fetchMyRatings(authorId: string): Promise<MyRating[]> {
+  const response = (await ratings.list({
+    pageNo: 1,
+    pageSize: MY_RATINGS_PAGE_SIZE,
+    filter: { CreatedBy: authorId }
+  })) as ListResponse;
+  const mine: MyRating[] = [];
+  for (const record of response.data?.getRatings?.items ?? []) {
+    const rating = toRating(record);
+    if (rating && typeof record.tmdbMovieId === "number") {
+      mine.push({ ...rating, tmdbMovieId: record.tmdbMovieId, ratedAt: record.LastUpdatedDate ?? "" });
+    }
+  }
+  // ISO timestamps sort as text; newest first.
+  return mine.sort((a, b) => b.ratedAt.localeCompare(a.ratedAt));
 }
 
 export async function fetchFilmRatings(tmdbMovieId: number): Promise<Rating[]> {

@@ -775,6 +775,17 @@ a {
   font-weight: 600;
 }
 
+/* The visitor's own score: outlined in full-strength text, so it reads as
+   neither TMDB's muted outline nor the community's lime fill. */
+.score--mine {
+  border: 1px solid var(--color-text);
+  color: var(--color-text);
+}
+
+.score--mine .score__value {
+  font-weight: 700;
+}
+
 .score__label {
   font-size: var(--text-caption);
   font-weight: 500;
@@ -1774,6 +1785,17 @@ button.user-menu__trigger:active {
 .profile-head__email {
   color: var(--color-text-muted);
   overflow-wrap: anywhere;
+}
+
+.profile-head__count {
+  color: var(--color-text-muted);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+}
+
+.my-ratings {
+  display: grid;
+  gap: var(--space-4);
 }
 
 /* ---------- Film page: your rating + actions ---------- */

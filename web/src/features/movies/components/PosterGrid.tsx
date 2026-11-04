@@ -1,7 +1,7 @@
 import type { MovieSummary } from "../types";
 import { PosterCard, PosterCardSkeleton } from "./PosterCard";
 
-const GRID_POSTER_SIZES = "(min-width: 1024px) 200px, (min-width: 768px) 25vw, 33vw";
+export const GRID_POSTER_SIZES = "(min-width: 1024px) 200px, (min-width: 768px) 25vw, 33vw";
 
 /** Browse and search results: 3 columns on phones, 4 from md, 5 from lg (design.md §4.2). */
 export function PosterGrid({ movies }: { movies: MovieSummary[] }) {

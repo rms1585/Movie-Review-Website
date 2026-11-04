@@ -1,13 +1,15 @@
-import { AppLink } from "../../app/router/navigation";
 import { Avatar, AvatarSkeleton } from "../../shared/ui/Avatar";
-import { EmptyState } from "../../shared/ui/EmptyState";
 import { ErrorState } from "../../shared/ui/ErrorState";
+import { MyRatingsSection } from "../ratings/MyRatingsSection";
+import { useMyRatings } from "../ratings/useRatings";
 import { fullName, initials, useCurrentUser } from "./useCurrentUser";
 
 /** The signed-in user's own profile (/me). RequireAuth guarantees a session before this renders. */
 export function MyProfilePage() {
   const me = useCurrentUser();
+  const myRatings = useMyRatings();
   const user = me.data;
+  const ratedCount = myRatings.data?.length;
   const name = fullName(user) || user?.email || "Your profile";
 
   return (
@@ -37,15 +39,15 @@ export function MyProfilePage() {
             <h1>{name}</h1>
             {/* Only ever on your own profile; public reviewer pages never show an email. */}
             {user?.email && name !== user.email && <p className="profile-head__email">{user.email}</p>}
+            {ratedCount !== undefined && ratedCount > 0 && (
+              <p className="profile-head__count">{ratedCount} {ratedCount === 1 ? "film" : "films"} rated</p>
+            )}
           </div>
         </div>
       )}
 
-      <EmptyState
-        action={<AppLink className="button button--secondary" to="/browse">Find a film to rate</AppLink>}
-        text="Your ratings, reviews and watchlist will show here once reviewing opens."
-        title="No reviews yet"
-      />
+      {/* The history is filtered by the user's id, so it waits for the profile. */}
+      {user && <MyRatingsSection />}
     </>
   );
 }
