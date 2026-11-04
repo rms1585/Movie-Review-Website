@@ -97,7 +97,10 @@
   --radius-sheet: 20px 20px 0 0;
   --radius-pill: 999px;
   --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.45);
-  --shadow-lift: 0 16px 28px rgba(0, 0, 0, 0.55);
+  /* Hover lift: a dark drop for depth plus a soft lime glow, so the
+     pointed-at film reads as live (design.md §1, hover feedback). */
+  --shadow-lift: 0 0 24px rgba(198, 244, 50, 0.35), 0 16px 28px rgba(0, 0, 0, 0.55);
+  --color-accent-tint: rgba(198, 244, 50, 0.12);
   --poster-lift: -6px;
   --poster-lift-scale: 1.04;
   /* The one source of the slideshow's pace: FeaturedHero advances when the
@@ -867,6 +870,13 @@ a {
   font-size: var(--text-ui);
   line-height: var(--leading-ui);
   font-weight: 600;
+  transition: color var(--motion-base) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .poster-card:hover .poster-card__title {
+    color: var(--color-accent);
+  }
 }
 
 .poster-card__meta {
@@ -903,7 +913,11 @@ a {
   grid-auto-columns: calc((100% - var(--space-4) * 2) / 3.2);
   gap: var(--space-4);
   margin: 0;
-  padding: var(--space-3) 0 var(--space-3);
+  /* A scroll row clips everything outside it, including the hover glow;
+     the extra padding gives the glow room and the negative margin hands
+     the space back, so the rail sits where it did. */
+  margin-block: calc(var(--space-3) * -1);
+  padding: var(--space-6) 0;
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -1294,16 +1308,22 @@ li.chip.skeleton {
   border-color: transparent;
 }
 
-.chip:hover {
-  background: var(--color-surface-raised);
+/* Mouse only: on touch, :hover sticks after a tap and would look selected. */
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
 }
 
 .chip:active {
   transform: scale(var(--press-scale));
 }
 
+/* Selected adds a faint tint, so it stays distinct from a hovered chip. */
 .chip[aria-current="true"] {
   border-color: var(--color-accent);
+  background: var(--color-accent-tint);
   color: var(--color-accent);
 }
 

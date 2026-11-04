@@ -13,7 +13,7 @@
 ## 1. Design principles
 
 1. **Content first.** Posters and backdrops are the colour on the page. The interface stays dark and quiet so the artwork leads.
-2. **One accent, one job.** Signal lime is used only for **primary actions** and **our community score**. Never for decoration, never for body text.
+2. **One accent, one job.** Signal lime is used only for **primary actions**, **our community score** and **hover feedback** on things you can open or pick (a poster's glow and title, a chip's outline). Never for decoration at rest, never for body text.
 3. **Glanceable decisions.** A visitor should know "is it good?" within 2 seconds of landing on a film: score, verdicts, then detail.
 4. **Spoiler-safe is the brand.** The frosted spoiler block is the signature visual. It must look deliberate and premium, not like a broken image.
 5. **Fast beats fancy.** If an effect costs load time or smoothness on a mid-range phone, cut it.
@@ -213,7 +213,7 @@ See §2.3.
 ### 7.3 Poster card
 - Poster (2:3, `--radius-sm`) → title (`--text-ui` 600, max 2 lines) → year · our score badge · TMDB badge.
 - The whole card is one link (one tab stop).
-- Hover (desktop): lift and brighten the poster; see `animation.md`. Focus: ring around the poster.
+- Hover (desktop): lift and brighten the poster, a soft lime glow fades in around it (`--shadow-lift`), and the title turns lime; see `animation.md`. Focus: ring around the poster.
 - Skeleton: poster box + 2 text bars in `--color-surface`.
 
 ### 7.4 Rails
@@ -226,7 +226,7 @@ See §2.3.
 - **Search:** pill shape, `--color-bg` fill, 1px border, lime border when focused. Suggestions open in a `--color-surface-raised` dropdown with `--shadow-float`.
 
 ### 7.6 Chips (genre, sort, filters)
-- Pill, 32px high, 1px border. **Selected:** lime border + lime text (not a lime fill, which is reserved for primary actions and our score).
+- Pill, 32px high, 1px border. **Hover (mouse only):** lime border + lime text. **Selected:** lime border + lime text + a faint lime tint (`--color-accent-tint`), so it stays distinct from hover. Never a solid lime fill, which is reserved for primary actions and our score.
 
 ### 7.7 Rating control (1–10)
 - 10 square buttons: one row on desktop, 2 × 5 on mobile. Each is 44px or larger.

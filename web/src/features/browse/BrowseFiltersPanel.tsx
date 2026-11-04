@@ -7,7 +7,8 @@ import { browseHref, decadeOptions, sortOptions } from "./browseFilters";
 
 /**
  * Each option is a link to the filtered URL; the selected one is marked
- * aria-current and drawn with a lime border, never a lime fill (design.md §7.6).
+ * aria-current and drawn with a lime border and faint tint, never a solid
+ * lime fill (design.md §7.6).
  */
 export function BrowseFiltersPanel({ filters }: { filters: BrowseFilters }) {
   const genres = useGenres();
