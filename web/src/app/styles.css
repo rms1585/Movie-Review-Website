@@ -826,17 +826,23 @@ a {
 
 .poster-card__art {
   border-radius: var(--radius-sm);
+}
+
+/* The lift goes on the poster inside the art box, never the box itself:
+   Motion owns the box's transform for the shared poster flight to the film
+   page and pins it inline, which would silently cancel a CSS hover. */
+.poster-card__art > .poster {
   transition: transform var(--motion-base) var(--ease-standard), filter var(--motion-base) var(--ease-standard);
 }
 
 @media (hover: hover) {
-  .poster-card:hover .poster-card__art {
+  .poster-card:hover .poster-card__art > .poster {
     transform: translateY(var(--poster-lift)) scale(var(--poster-lift-scale));
     filter: brightness(1.08);
   }
 }
 
-.poster-card:active .poster-card__art {
+.poster-card:active .poster-card__art > .poster {
   transform: scale(var(--press-scale));
   transition-duration: var(--motion-instant);
 }
@@ -2332,12 +2338,12 @@ button.user-menu__trigger:active {
   .button:active,
   button.user-menu__trigger:active,
   .chip:active,
-  .poster-card:active .poster-card__art,
+  .poster-card:active .poster-card__art > .poster,
   .rail__arrow:active {
     transform: none;
   }
 
-  .poster-card:hover .poster-card__art {
+  .poster-card:hover .poster-card__art > .poster {
     transform: none;
   }
 
