@@ -58,7 +58,7 @@ export function AppRouter() {
   // Keyed by path only: changing a Browse filter or search term updates the
   // page in place instead of replaying the page-enter animation.
   return (
-    <AppShell animateEnter={!/^\/movie\/\d+$/.test(path)} pageKey={path}>
+    <AppShell animateEnter={!/^\/movie\/\d+$/.test(path)} fullBleed={path === "/"} pageKey={path}>
       {requiresAuth ? <RequireAuth>{element}</RequireAuth> : element}
     </AppShell>
   );

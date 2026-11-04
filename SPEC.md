@@ -126,7 +126,7 @@ All records are keyed by `tmdbMovieId` + `userId`. Field limits are defaults and
 Every screen handles **loading, empty, error and success**. Interactive elements also handle **hover, focus, active and disabled**.
 
 ### 7.1 Home
-- Hero: one featured trending film (backdrop, title, our score, CTA to the detail page)
+- Hero: a carousel of 6 featured trending films, one every 7s, with pause, arrows and dots (backdrop, title, our score, CTA to the detail page)
 - Rails: Trending now · New releases · Top rated by our community · Browse by genre chips
 - Loading: skeleton cards · Error: "Movie info is taking a break, try again shortly" + Retry
 

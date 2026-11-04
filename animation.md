@@ -170,6 +170,11 @@ Each entry: **trigger → what moves → timing → notes.**
 
 ### 4.17 Hero (home)
 - The backdrop fades in (§4.5). **No** Ken Burns zoom, parallax or autoplaying video. They cost data and smoothness and distract from the content.
+- The hero is a carousel of the top 6 trending films with a backdrop. Slides **crossfade** (`--motion-image`) every **7s** (`--hero-interval`); nothing slides or zooms.
+- The current dot fills across the interval, and the slide changes when it finishes, so the visible progress and the advance share one clock.
+- Autoplay pauses for the pause button (WCAG 2.2.2), pointer hover, keyboard focus inside the carousel and a hidden tab. Under reduced motion it never autoplays; arrows, dots, arrow keys and swipe still work.
+- Backdrops load for the current and next slide only.
+- The banner runs edge to edge under the header, and its bottom fades into the page background, so Trending begins without a hard edge. The dots sit under "See the film"; the arrows and pause are plain icons, with no circles, in the bottom-right corner.
 
 ---
 

@@ -26,6 +26,8 @@
   --color-on-accent: #0e1116;
   --color-overlay: rgba(8, 10, 13, 0.72);
   --color-scrim: linear-gradient(to top, #0e1116 0%, rgba(14, 17, 22, 0.6) 45%, rgba(14, 17, 22, 0) 100%);
+  --color-scrim-side: linear-gradient(to right, rgba(14, 17, 22, 0.7) 0%, rgba(14, 17, 22, 0) 60%);
+  --color-fade-to-bg: linear-gradient(to bottom, rgba(14, 17, 22, 0) 0%, var(--color-bg) 100%);
   --color-header: rgba(24, 28, 35, 0.9);
   --color-error: #ff6b6b;
   --color-error-surface: #2a1719;
@@ -96,6 +98,19 @@
   --shadow-lift: 0 16px 28px rgba(0, 0, 0, 0.55);
   --poster-lift: -6px;
   --poster-lift-scale: 1.04;
+  /* The one source of the slideshow's pace: FeaturedHero advances when the
+     progress fill finishes, so changing this changes the interval. */
+  --hero-interval: 7s;
+  --hero-dot-w: 24px;
+  --hero-dot-track: 20px;
+  --hero-dot-h: 4px;
+  --hero-quiet-icon: 14px;
+  --icon-size: 18px;
+  /* Tall enough to feel full-screen, short enough that Trending peeks
+     above the fold and says "there's more below". */
+  --hero-height: clamp(440px, 72svh, 620px);
+  --hero-fade-height: 30%;
+  --hero-bar-bottom: var(--space-8);
   --blur-header: 12px;
 
   --logo-symbol: 28px;
@@ -127,6 +142,9 @@
     --leading-verdict: 28px;
     --gutter: 32px;
     --section-gap: var(--space-16);
+    --hero-height: clamp(520px, calc(88svh - var(--header-height)), 860px);
+    --hero-bar-bottom: var(--space-16);
+    --hero-dot-w: 28px;
   }
 }
 
@@ -631,8 +649,8 @@ a {
 
 /* ---------- Shared bits ---------- */
 .icon {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-size);
+  height: var(--icon-size);
   flex: none;
 }
 
@@ -989,16 +1007,61 @@ a {
 /* ---------- Home hero (SPEC §7.1) ---------- */
 .home {
   display: grid;
+  /* Without minmax the rails' min-content width widens the column past the
+     screen on small phones and pushes the banner controls off the edge. */
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The home page runs edge to edge, so its hero touches the header. */
+.app-main--bleed {
+  padding-top: 0;
+}
+
+.home__rails {
+  display: grid;
+}
+
+/* Trending starts where the banner's fade ends, without a second gap. */
+.home__rails > .rail:first-child {
+  margin-top: 0;
+}
+
+.hero-carousel {
+  /* Lines the hero's text and controls up with the centred content column
+     below, however wide the screen; percentages resolve against the hero. */
+  --hero-inset: max(var(--gutter), calc((100% - var(--content-max)) / 2));
+  position: relative;
 }
 
 .hero {
   position: relative;
   display: grid;
-  align-items: end;
-  aspect-ratio: 16 / 9;
+  height: var(--hero-height);
   overflow: hidden;
-  border-radius: var(--radius-lg);
   background: var(--color-surface);
+  /* Horizontal swipes change slides; vertical ones still scroll the page. */
+  touch-action: pan-y;
+}
+
+/* Slides share one grid cell so they crossfade in place without
+   absolute positioning taking them out of the hero's height. */
+.hero__slide {
+  position: relative;
+  grid-area: 1 / 1;
+  display: grid;
+  align-items: end;
+  padding-inline: var(--hero-inset);
+  /* Leaves a row under "See the film" for the dots. */
+  padding-bottom: calc(var(--hero-bar-bottom) + var(--target-min) + var(--space-2));
+  transition: opacity var(--motion-image) var(--ease-standard);
+}
+
+.js .hero__slide:not(.is-active) {
+  opacity: 0;
+}
+
+.hero__slide.is-active {
+  z-index: 1;
 }
 
 .hero__backdrop {
@@ -1009,10 +1072,17 @@ a {
   object-fit: cover;
 }
 
+/* Left darkening keeps the title readable on any frame now that the
+   image spans the whole screen; the bottom band fades the image into the
+   page so the banner has no hard edge where Trending begins. It lives in
+   each slide, under the text, so it never dims the action. */
 .hero__scrim {
   position: absolute;
   inset: 0;
-  background: var(--color-scrim);
+  background:
+    var(--color-fade-to-bg) bottom / 100% var(--hero-fade-height) no-repeat,
+    var(--color-scrim-side),
+    var(--color-scrim);
 }
 
 .hero__content {
@@ -1020,7 +1090,6 @@ a {
   display: grid;
   gap: var(--space-3);
   max-width: 720px;
-  padding: var(--space-4);
 }
 
 .hero__title {
@@ -1042,30 +1111,129 @@ a {
   color: var(--color-text);
 }
 
-/* Phones keep the title and action over the image; the plot joins once
-   there is room for it without covering the whole backdrop. */
-@media (max-width: 767px) {
-  .hero {
-    aspect-ratio: 4 / 3;
-  }
-}
-
 @media (min-width: 768px) {
-  .hero {
-    aspect-ratio: auto;
-    height: 480px;
-  }
-
-  .hero__content {
-    padding: var(--space-10);
-  }
-
   .hero__overview {
     display: -webkit-box;
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     max-width: 52ch;
+  }
+}
+
+/* Dots under the slide's action on the left; arrows and pause in the
+   bottom-right corner. Both float above the fade. */
+.hero__bar {
+  position: absolute;
+  inset-inline: var(--hero-inset);
+  bottom: var(--hero-bar-bottom);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.hero__controls {
+  display: flex;
+  align-items: center;
+  /* Ghost buttons: pulls the last icon flush with the content edge. */
+  margin-right: calc((var(--target-min) - var(--icon-size)) / -2);
+}
+
+.hero__control {
+  display: grid;
+  place-items: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color var(--motion-instant) var(--ease-standard), color var(--motion-instant) var(--ease-standard), transform var(--motion-instant) var(--ease-standard);
+}
+
+.hero__control:hover {
+  background: var(--color-surface-raised);
+}
+
+.hero__control:active {
+  transform: scale(var(--press-scale));
+}
+
+/* Pause stays findable but recedes, so the film and its one primary
+   action keep the attention. */
+.hero__control--quiet {
+  color: var(--color-text-muted);
+}
+
+.hero__control--quiet:hover {
+  color: var(--color-text);
+}
+
+.hero__control--quiet .icon {
+  width: var(--hero-quiet-icon);
+  height: var(--hero-quiet-icon);
+}
+
+.hero__dots {
+  display: flex;
+  /* Starts the first track flush with the button above it. */
+  margin-left: calc((var(--hero-dot-w) - var(--hero-dot-track)) / -2);
+}
+
+.hero__dot {
+  display: grid;
+  place-items: center;
+  width: var(--hero-dot-w);
+  height: var(--target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
+}
+
+.hero__dot-track {
+  display: block;
+  width: var(--hero-dot-track);
+  height: var(--hero-dot-h);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-border-strong);
+  transition: background-color var(--motion-instant) var(--ease-standard);
+}
+
+.hero__dot:hover .hero__dot-track {
+  background: var(--color-text-muted);
+}
+
+/* The current slide's fill is solid when the slideshow can't run
+   (reduced motion) and grows across the interval when it can. */
+.hero__dot-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-text);
+  transform-origin: left center;
+}
+
+.hero__dot-fill.is-timed {
+  animation: hero-progress var(--hero-interval) var(--ease-linear) forwards;
+}
+
+.hero__dot-fill.is-paused {
+  animation-play-state: paused;
+}
+
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
   }
 }
 
@@ -1883,6 +2051,10 @@ button.user-menu__trigger:active {
   }
 
   .poster-card:hover .poster-card__art {
+    transform: none;
+  }
+
+  .hero__control:active {
     transform: none;
   }
 
