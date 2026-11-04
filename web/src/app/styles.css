@@ -28,6 +28,8 @@
   --color-scrim: linear-gradient(to top, #0e1116 0%, rgba(14, 17, 22, 0.6) 45%, rgba(14, 17, 22, 0) 100%);
   --color-scrim-side: linear-gradient(to right, rgba(14, 17, 22, 0.7) 0%, rgba(14, 17, 22, 0) 60%);
   --color-fade-to-bg: linear-gradient(to bottom, rgba(14, 17, 22, 0) 0%, var(--color-bg) 100%);
+  --color-fade-from-top: linear-gradient(to top, rgba(14, 17, 22, 0) 0%, var(--color-bg) 100%);
+  --color-fade-from-left: linear-gradient(to right, var(--color-bg) 0%, rgba(14, 17, 22, 0.25) 40%, rgba(14, 17, 22, 0) 70%);
   --color-header: rgba(24, 28, 35, 0.9);
   --color-error: #ff6b6b;
   --color-error-surface: #2a1719;
@@ -107,6 +109,9 @@
   --hero-quiet-icon: 14px;
   --form-w: 520px;
   --signup-icon: 40px;
+  --signup-art-width: 60%;
+  --signup-art-height: calc(100dvh - var(--header-height));
+  --signup-fade-edge: 15%;
   --icon-size: 18px;
   /* Tall enough to feel full-screen, short enough that Trending peeks
      above the fold and says "there's more below". */
@@ -1707,6 +1712,54 @@ li.chip.skeleton {
 }
 
 /* ---------- Sign-up page ---------- */
+.signup-page {
+  position: relative;
+  /* Clips the art's right edge and stops it adding sideways scroll. */
+  overflow: clip;
+}
+
+.signup-page__body {
+  position: relative;
+  z-index: 1;
+  padding-block: var(--section-gap);
+}
+
+/* The still sits under the right side and dissolves into the page towards
+   the form; overlays in the page colour stand in for a mask. Wide screens
+   only: on narrower ones it would sit under the form's text. */
+.signup-page__art {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .signup-page {
+    min-height: var(--signup-art-height);
+  }
+
+  .signup-page__art {
+    position: absolute;
+    inset: 0 0 0 auto;
+    display: block;
+    width: var(--signup-art-width);
+  }
+
+  .signup-page__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .signup-page__art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      var(--color-fade-to-bg) bottom / 100% var(--signup-fade-edge) no-repeat,
+      var(--color-fade-from-top) top / 100% var(--signup-fade-edge) no-repeat,
+      var(--color-fade-from-left);
+  }
+}
+
 .signup {
   display: grid;
   max-width: var(--form-w);

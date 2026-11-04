@@ -5,6 +5,9 @@ import type { FormEvent } from "react";
 import { useAuth } from "../../app/providers/AuthProvider";
 import { AppLink } from "../../app/router/navigation";
 import { EmptyState } from "../../shared/ui/EmptyState";
+import { FadeImage } from "../movies/components/FadeImage";
+import { backdropSource } from "../movies/images";
+import { useTrending } from "../movies/queries";
 import { signUp } from "./signupApi";
 
 // A light format check so obvious typos fail before the round trip;
@@ -28,19 +31,41 @@ export function SignUpPage() {
   const { status } = useAuth();
   const [sentTo, setSentTo] = useState<string | undefined>();
 
-  if (status === "authenticated") {
-    return (
-      <EmptyState
-        action={<AppLink className="button button--primary" to="/me">Go to your profile</AppLink>}
-        text="You already have an account and you're signed in."
-        title="You're signed in"
-      />
-    );
-  }
-
   return (
-    <div className="signup">
-      {sentTo ? <CheckYourEmail email={sentTo} onUseDifferentEmail={() => setSentTo(undefined)} /> : <SignUpForm onSent={setSentTo} />}
+    <div className="signup-page">
+      <SignUpArt />
+      <div className="container signup-page__body">
+        {status === "authenticated" ? (
+          <EmptyState
+            action={<AppLink className="button button--primary" to="/me">Go to your profile</AppLink>}
+            text="You already have an account and you're signed in."
+            title="You're signed in"
+          />
+        ) : (
+          <div className="signup">
+            {sentTo ? <CheckYourEmail email={sentTo} onUseDifferentEmail={() => setSentTo(undefined)} /> : <SignUpForm onSent={setSentTo} />}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A film still on the right that fades into the page towards the form. It is
+ * the top trending film's backdrop, which the home page has usually loaded
+ * already; a fixed pick could disappear from TMDB. Purely decorative.
+ */
+function SignUpArt() {
+  const trending = useTrending();
+  const path = trending.data?.find((movie) => movie.backdropPath)?.backdropPath;
+  if (!path) return null;
+
+  const backdrop = backdropSource(path);
+  return (
+    <div aria-hidden="true" className="signup-page__art">
+      {/* Lazy, so phones (where CSS hides the art) never download it. */}
+      <FadeImage alt="" className="signup-page__image" loading="lazy" sizes="60vw" src={backdrop.src} srcSet={backdrop.srcSet} />
     </div>
   );
 }
